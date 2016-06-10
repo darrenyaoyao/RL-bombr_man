@@ -102,6 +102,10 @@ class AI(serge.common.Loggable):
             #
             # Do the move
             if self.state.current == S_WAITING:
+                # observation add
+                if self.enemy.name == "ai":
+                    agent_dic = board.observation[-1]
+                    agent_dic["action"] = 0
                 self.chooseDestination(man, board)
             elif self.state.current in (S_MOVING, S_ESCAPING, S_CLEARING):
                 self.makeNextMove(man, board)
@@ -119,6 +123,9 @@ class AI(serge.common.Loggable):
         if move == ' ':
             pass
         elif move == 'b':
+            if self.enemy.name == "ai":
+                agent_dic = board.observation[-1]
+                agent_dic["action"] = 5
             board.dropBomb(man)
         else:
             direction = serge.blocks.directions.getVectorFromCardinal(move)
@@ -127,6 +134,10 @@ class AI(serge.common.Loggable):
     def makeNextMove(self, man, board):
         """Make the next move to our destination"""
         if not self.selected_path:
+            # observation add
+            if self.enemy.name == "ai":
+                agent_dic = board.observation[-1]
+                agent_dic["action"] = 0
             self.state.arrived(man=man, board=board)
         else:
             mx, my = board.getPosition(man)
@@ -138,6 +149,10 @@ class AI(serge.common.Loggable):
             # Only make the move if we can
             if not board.canOccupy(man, (nx, ny)):
                 self.log.debug('%s cannot move to %s, %s' % (man.getNiceName(), nx, ny))
+                # observation add
+                if self.enemy.name == "ai":
+                    agent_dic = board.observation[-1]
+                    agent_dic["action"] = 0
                 if board.isSafe((nx, ny)):
                     self.state.current = S_WAITING
                 else:
@@ -150,8 +165,14 @@ class AI(serge.common.Loggable):
                 if not self.walk.isPlaying():
                     self.walk.play()
                 board.moveMan(man, (nx - mx, ny - my))
+                if self.enemy.name == "ai":
+                    self.obseradd((nx - mx, ny - my), board)
                 self.selected_path.pop(0)
             else:
+                # observation add
+                if self.enemy.name == "ai":
+                    agent_dic = board.observation[-1]
+                    agent_dic["action"] = 0
                 #
                 # Ok - it isn't safe to make the move
                 self.log.debug('Not safe for %s to move to %s, %s' % (man.getNiceName(), nx, ny))
@@ -317,6 +338,21 @@ class AI(serge.common.Loggable):
             #
             # No path to safety
             return False
+
+    def obseradd(self, direction, board):
+        # observation add
+        agent_dic = board.observation[-1]
+        if direction == (-1, 0):
+            agent_dic["action"] = 1
+        elif direction == (+1, 0):
+            agent_dic["action"] = 2
+        elif direction == (0, -1):
+            agent_dic["action"] = 3
+        elif direction == (0, 1):
+            agent_dic["action"] = 4
+        else:
+            agent_dic["action"] = 0
+        
 
 
 class AIUI(serge.actor.Actor):
