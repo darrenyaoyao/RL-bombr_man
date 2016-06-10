@@ -184,7 +184,8 @@ theme.load({
     # Random items creation
     # 'random-item-low-time': 10,
     # 'random-item-high-time': 15,
-    'random-item-names': ['Bomb', 'Heart', 'Bomb', 'RedHeart', 'MultiBomb', 'Flag'],
+    #'random-item-names': ['Bomb', 'Heart', 'Bomb', 'RedHeart', 'MultiBomb', 'Flag'],
+    'random-item-names': ['Bomb', 'MultiBomb', 'Flag'],
     'random-item-low-time': 2,
     'random-item-high-time': 4,
     # 'random-item-names': ['MultiBomb'],

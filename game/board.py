@@ -146,22 +146,7 @@ class Board(serge.blocks.actors.ScreenActor):
         # Update debugging views
         if self.unsafe:
             self.updateUnsafe()
-        # Update observation
-        agent_dic = self.observation[-1]
-        w, h = self.size
-        layer = self.tiles.getLayerByType('visual')
-        for x in range(w):
-            for y in range(h):
-                sprite = layer.getSpriteFor((x, y))
-                agent_dic["observation"].append(int(sprite.name[-1]))
-        for man in self.men:
-            if man.name == "player":
-                agent_dic["observation"][self.men[man][0]+19*self.men[man][1]] = 6
-            elif man.name == "ai":
-                agent_dic["observation"][self.men[man][0]+19*self.men[man][1]] = 7
-            else:
-                agent_dic["observation"][self.men[man][0]+19*self.men[man][1]] = 8
-        self.observation.append({"action": 0, "observation": []})
+        self.updateobservation()
 
 
     def updateVisual(self):
@@ -183,6 +168,30 @@ class Board(serge.blocks.actors.ScreenActor):
         # Put overlay on
         self.visual.getSurface().blit(self.overlay.getSurface(), (0, 0))
         self._visual_dirty = False
+
+    def updateobservation(self):
+        # Update observation
+        agent_dic = self.observation[-1]
+        w, h = self.size
+        layer = self.tiles.getLayerByType('visual')
+        for x in range(w):
+            for y in range(h):
+                sprite = layer.getSpriteFor((x, y))
+                agent_dic["observation"].append(int(sprite.name[-1]))
+        for man in self.men:
+            if man.name == "player":
+                agent_dic["observation"][self.men[man][0]+19*self.men[man][1]] = 6
+            elif man.name == "ai":
+                agent_dic["observation"][self.men[man][0]+19*self.men[man][1]] = 7
+            elif man.__class__.__name__ == "Bomb":
+                agent_dic["observation"][self.men[man][0]+19*self.men[man][1]] = 8
+            elif man.__class__.__name__ == "Explosion":
+                agent_dic["observation"][self.men[man][0]+19*self.men[man][1]] = 9
+            elif man.__class__.__name__ == "Flag":
+                agent_dic["observation"][self.men[man][0]+19*self.men[man][1]] = 0
+            else:
+                agent_dic["observation"][self.men[man][0]+19*self.men[man][1]] = 3
+        self.observation.append({"action": 0, "observation": []})
 
     def addFootsteps(self, (x, y), (dx, dy)):
         """Add some footsteps to the screen"""
@@ -224,7 +233,7 @@ class Board(serge.blocks.actors.ScreenActor):
         w, h = self.cell_size
         x, y = px - w / 2 - 3, py - h / 2 - 3
         #
-        # Put all parts of the blast on the overlays
+        # Put all parts of the blast on the overlays/
         for i in range(G('number-gore')):
             angle = random.randrange(0, 360)
             self.gore.setAngle(angle)
