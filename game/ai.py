@@ -125,7 +125,7 @@ class AI(serge.common.Loggable):
         elif move == 'b':
             if self.enemy.name == "ai":
                 agent_dic = board.observation[-1]
-                agent_dic["action"] = 5
+                agent_dic["action"] *= 2
             board.dropBomb(man)
         else:
             direction = serge.blocks.directions.getVectorFromCardinal(move)
@@ -343,13 +343,13 @@ class AI(serge.common.Loggable):
         # observation add
         agent_dic = board.observation[-1]
         if direction == (-1, 0):
-            agent_dic["action"] = 1
-        elif direction == (+1, 0):
             agent_dic["action"] = 2
-        elif direction == (0, -1):
-            agent_dic["action"] = 3
-        elif direction == (0, 1):
+        elif direction == (+1, 0):
             agent_dic["action"] = 4
+        elif direction == (0, +1):
+            agent_dic["action"] = 6
+        elif direction == (0, -1):
+            agent_dic["action"] = 8
         else:
             agent_dic["action"] = 0
         
