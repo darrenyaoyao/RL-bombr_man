@@ -132,7 +132,7 @@ theme.load({
     'ai-bomb-probability': 0.5,
     'ai-squares-view': 2,
     'ai-look-ahead': 2,
-    'all-ai': False,
+    'all-ai': True,
     'ai-show-destinations': True,
     'ai-show-unsafe': True,
     'ai-unsafe-colour': (0, 0, 0, 100),
