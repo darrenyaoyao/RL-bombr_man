@@ -1,4 +1,4 @@
-#import bombrtrain
+import bombrtrain
 import argparse
 
 parser = argparse.ArgumentParser(description='Bombr Game')
