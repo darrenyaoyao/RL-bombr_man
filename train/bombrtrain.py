@@ -16,6 +16,3 @@ class bombrtrain:
 
    def data_init(self):
       #Todo
-      
-
-
