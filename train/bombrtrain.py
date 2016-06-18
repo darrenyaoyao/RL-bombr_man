@@ -1,6 +1,7 @@
 from keras.models import Sequential
 from keras.layers.core import Dense, Dropout, Flatten, Reshape
 from keras.layers.convolutional import Convolution2D
+from DQN import DQN
 import numpy as np
 BOMBR_COLUMN = 19
 BOMBR_ROW = 19
@@ -76,4 +77,4 @@ class bombrtrain:
       self.model.fit(np.asarray(self.states), np.asarray(self.actions), batch_size=128, nb_epoch=20, verbose=1, validation_split=0.1)
 
    def models_save_weight(self):
-      self.model.save_weight('model_weight.h5')
+      self.model.save_weights('model_weight.h5')
