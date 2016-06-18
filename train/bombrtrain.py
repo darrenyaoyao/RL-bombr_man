@@ -12,10 +12,10 @@ class bombrtrain:
       self.models_init()
 
    def parse_policy_train_data(self):
-      for i in range(len(sequence)):
-          for j in range(len(sequence[i])):
-              self.states.append(sequence[i][j][St])
-              self.actions.append(sequence[i][j][At])
+      for i in range(len(self.sequence)):
+          for j in range(len(self.sequence[i])):
+              self.states.append(self.sequence[i][j][St])
+              self.actions.append(self.sequence[i][j][At])
    def models_init(self):
       #Todo
       model = Sequential()
@@ -28,6 +28,7 @@ class bombrtrain:
       model.add(Dropout(0.5))
       model.add(Dense(action_classes, activation='softmax'))
       open('model.json', 'w').write(model.to_json())
+      model.save_weights('weights.h5', overwrite=True)
 
    def models_policy_train(self):
       model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
