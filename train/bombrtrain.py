@@ -20,19 +20,19 @@ class bombrtrain:
    def parse_policy_train_data(self):
       self.states = []
       self.actions = []
-      state_action_pairs = []
+      last_state_action_pair = [FINALSTATE, np.zeros(10)]
       for i in range(len(self.sequence)):
          for j in range(len(self.sequence[i])):
-            if(self.check_duplicate(state_action_pairs, self.sequence[i][j])):
+            if(self.check_duplicate(last_state_action_pair, self.sequence[i][j])):
                self.states.append(self.sequence[i][j]['St'])
                self.actions.append(self.sequence[i][j]['At'])
 
-   def check_duplicate(self, state_action_pairs, data):
-      state_action_pair = (data['St'], data['At'])
-      if state_action_pair in state_action_pairs:
+   def check_duplicate(self, last_state_action_pair, data):
+      if (data['St'] == last_state_action_pair[0]).all() and (data['At'] == last_state_action_pair[1]).all():
          return False
       else:
-         state_action_pairs.append(state_action_pair)
+         last_state_action_pair[0] = data['St']
+         last_state_action_pair[1] = data['At']
          return True
 
    def models_init(self):
