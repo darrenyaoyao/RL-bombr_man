@@ -2,6 +2,7 @@ from keras.models import Sequential
 from keras.layers.core import Dense, Dropout, Flatten, Reshape
 from keras.layers.convolutional import Convolution2D
 import numpy as np
+import DQN as DQN
 BOMBR_COLUMN = 19
 BOMBR_ROW = 19
 FINALSTATE = np.full((19,19),3)
@@ -27,7 +28,7 @@ class bombrtrain:
                self.actions.append(self.sequence[i][j]['At'])
 
    def check_duplicate(self, state_action_pairs, data):
-      state_action_pair = (data['St'], data['At'])
+      state_action_pair = [data['St'], data['At']]
       if state_action_pair in state_action_pairs:
          return False
       else:
