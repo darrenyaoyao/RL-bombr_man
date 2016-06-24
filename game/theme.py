@@ -43,7 +43,7 @@ theme.load({
     'screenshot-interval': 5,
 
     # Simulation properties
-    'simulation-on': False,
+    'simulation-on': True,
     'simulation-rtf': 10,
     'simulation-fps': 1,
     'simulation-auto-restart': False,

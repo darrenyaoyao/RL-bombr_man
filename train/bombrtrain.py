@@ -1,10 +1,11 @@
 from keras.models import Sequential
 from keras.layers.core import Dense, Dropout, Flatten, Reshape
 from keras.layers.convolutional import Convolution2D
+from keras.callbacks import EarlyStopping, ModelCheckpoint
 import numpy as np
 BOMBR_COLUMN = 19
 BOMBR_ROW = 19
-FINALSTATE = np.full((19,19),3)
+FINALSTATE = np.full((19,19),3.0)
 REWARD = 0
 ACTION_CLASSES = 10
 
@@ -50,6 +51,7 @@ class bombrtrain:
          data = list()
          for counter, d in enumerate(ori_data):
              timeslice = np.fromstring(d, sep = ",")
+             timeslice = timeslice.astype(np.int32)
              action=np.zeros(10)
              action[timeslice[0]] = 1
              if len(timeslice) != 1:
@@ -73,7 +75,11 @@ class bombrtrain:
    def models_policy_train(self):
       self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
       self.model.summary()
-      self.model.fit(np.asarray(self.states), np.asarray(self.actions), batch_size=128, nb_epoch=20, verbose=1, validation_split=0.1)
+      callbacks = [
+          EarlyStopping(monitor='val_loss', patience=5, verbose=0),
+          ModelCheckpoint(filepath="model_weight.h5", monitor='val_loss', save_best_only=True, verbose=0)
+      ]
+      self.model.fit(np.asarray(self.states), np.asarray(self.actions), batch_size=128, nb_epoch=20, verbose=1, validation_split=0.1, callbacks=callbacks)
 
-   def models_save_weight(self):
-      self.model.save_weights('model_weight.h5')
+   #def models_save_weight(self):
+      #self.model.save_weights('model_weight.h5')
