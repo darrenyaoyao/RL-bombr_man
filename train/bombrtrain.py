@@ -1,7 +1,6 @@
 from keras.models import Sequential
 from keras.layers.core import Dense, Dropout, Flatten, Reshape
 from keras.layers.convolutional import Convolution2D
-from DQN import DQN
 import numpy as np
 BOMBR_COLUMN = 19
 BOMBR_ROW = 19
@@ -20,10 +19,20 @@ class bombrtrain:
    def parse_policy_train_data(self):
       self.states = []
       self.actions = []
+      state_action_pairs = [] 
       for i in range(len(self.sequence)):
-          for j in range(len(self.sequence[i])):
-              self.states.append(self.sequence[i][j]['St'])
-              self.actions.append(self.sequence[i][j]['At'])
+         for j in range(len(self.sequence[i])):
+            if(self.check_duplicate(state_action_pairs, self.sequence[i][j])):
+               self.states.append(self.sequence[i][j]['St'])
+               self.actions.append(self.sequence[i][j]['At'])
+
+   def check_duplicate(self, state_action_pairs, data):
+      state_action_pair = (data['St'], data['At'])
+      if state_action_pair in state_action_pairs:
+         return False
+      else:
+         state_action_pairs.append(state_action_pair)
+         return True
 
    def models_init(self):
       #Todo
