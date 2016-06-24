@@ -1,11 +1,12 @@
 from keras.models import Sequential
 from keras.layers.core import Dense, Dropout, Flatten, Reshape
 from keras.layers.convolutional import Convolution2D
+from keras.callbacks import EarlyStopping, ModelCheckpoint
 import numpy as np
 import DQN as DQN
 BOMBR_COLUMN = 19
 BOMBR_ROW = 19
-FINALSTATE = np.full((19,19),3)
+FINALSTATE = np.full((19,19),3.0)
 REWARD = 0
 ACTION_CLASSES = 10
 
@@ -20,19 +21,19 @@ class bombrtrain:
    def parse_policy_train_data(self):
       self.states = []
       self.actions = []
-      state_action_pairs = [] 
+      last_state_action_pair = [FINALSTATE, np.zeros(10)]
       for i in range(len(self.sequence)):
          for j in range(len(self.sequence[i])):
-            if(self.check_duplicate(state_action_pairs, self.sequence[i][j])):
+            if(self.check_duplicate(last_state_action_pair, self.sequence[i][j])):
                self.states.append(self.sequence[i][j]['St'])
                self.actions.append(self.sequence[i][j]['At'])
 
-   def check_duplicate(self, state_action_pairs, data):
-      state_action_pair = [data['St'], data['At']]
-      if state_action_pair in state_action_pairs:
+   def check_duplicate(self, last_state_action_pair, data):
+      if (data['St'] == last_state_action_pair[0]).all() and (data['At'] == last_state_action_pair[1]).all():
          return False
       else:
-         state_action_pairs.append(state_action_pair)
+         last_state_action_pair[0] = data['St']
+         last_state_action_pair[1] = data['At']
          return True
 
    def models_init(self):
@@ -61,6 +62,7 @@ class bombrtrain:
          data = list()
          for counter, d in enumerate(ori_data):
              timeslice = np.fromstring(d, sep = ",")
+             timeslice = timeslice.astype(np.int32)
              action=np.zeros(10)
              action[timeslice[0]] = 1
              if len(timeslice) != 1:
@@ -84,7 +86,9 @@ class bombrtrain:
    def models_policy_train(self):
       self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
       self.model.summary()
-      self.model.fit(np.asarray(self.states), np.asarray(self.actions), batch_size=128, nb_epoch=20, verbose=1, validation_split=0.1)
+      callbacks = [
+          EarlyStopping(monitor='val_loss', patience=5, verbose=0),
+          ModelCheckpoint(filepath="model_weight.h5", monitor='val_loss', save_best_only=True, verbose=0)
+      ]
+      self.model.fit(np.asarray(self.states), np.asarray(self.actions), batch_size=128, nb_epoch=20, verbose=1, validation_split=0.1, callbacks=callbacks)
 
-   def models_save_weight(self):
-      self.model.save_weights('model_weight.h5')
