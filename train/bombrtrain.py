@@ -3,7 +3,6 @@ from keras.layers.core import Dense, Dropout, Flatten, Reshape
 from keras.layers.convolutional import Convolution2D
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 import numpy as np
-import DQN as DQN
 BOMBR_COLUMN = 19
 BOMBR_ROW = 19
 FINALSTATE = np.full((19,19),3.0)
@@ -29,7 +28,7 @@ class bombrtrain:
                self.actions.append(self.sequence[i][j]['At'])
 
    def check_duplicate(self, last_state_action_pair, data):
-      if (data['St'] == last_state_action_pair[0]).all() and (data['At'] == last_state_action_pair[1]).all():
+      if (data['At'] == np.zeros(10)).all() and (data['St'] == last_state_action_pair[0]).all() and (data['At'] == last_state_action_pair[1]).all():
          return False
       else:
          last_state_action_pair[0] = data['St']
