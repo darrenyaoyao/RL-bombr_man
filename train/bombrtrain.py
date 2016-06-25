@@ -91,3 +91,11 @@ class bombrtrain:
       ]
       self.model.fit(np.asarray(self.states), np.asarray(self.actions), batch_size=128, nb_epoch=20, verbose=1, validation_split=0.1, callbacks=callbacks)
 
+   def test_predict(self):
+      self.model.load_weights("model_weight.h5")
+      self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+      for x in self.states:
+         state = np.zeros((1, BOMBR_ROW, BOMBR_COLUMN))
+         state[0] = x
+         action = self.model.predict_classes(state)
+         print (action)

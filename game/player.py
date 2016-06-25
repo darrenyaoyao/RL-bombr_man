@@ -29,28 +29,30 @@ class Player(object):
         """Update the control of the actor"""
         #
         # Find out the way the player wants to go
+        current_state = board.observation[-1]#current state, no observation
         if len(board.observation) > 1:
-            agent_dic = board.observation[-2]
+            last_state = board.observation[-2]
         else:
-            agent_dic = board.observation[-1]
+            last_state = board.observation[-1]
+
         if board.options.random:
-            direction = self.random_policy(agent_dic)
+            direction = self.random_policy(current_state)
         elif board.options.supervised_policy:
-            direction = self.supervised_policy(agent_dic)
+            direction = self.supervised_policy(last_state)
         else:
             direction = None       
             if self.keyboard.isDown(pygame.K_LEFT):
                 direction = (-1, 0)
-                agent_dic["action"] = 2
+                current_state["action"] = 2
             if self.keyboard.isDown(pygame.K_RIGHT):
                 direction = (+1, 0)
-                agent_dic["action"] = 4
+                current_state["action"] = 4
             if self.keyboard.isDown(pygame.K_UP):
                 direction = (0, -1)
-                agent_dic["action"] = 6
+                current_state["action"] = 6
             if self.keyboard.isDown(pygame.K_DOWN):
                 direction = (0, +1)
-                agent_dic["action"] = 8
+                current_state["action"] = 8
         
         #
         # Check that we can go there
@@ -63,12 +65,12 @@ class Player(object):
         # See if any bombs should be dropped
         if board.options.random and direction == None:
             if man.canDropBomb():
-                agent_dic["action"] += 1
+                current_state["action"] += 1
                 board.dropBomb(man)
                 serge.sound.Sounds.play('drop')
         elif self.keyboard.isClicked(pygame.K_SPACE):
             if man.canDropBomb():
-                agent_dic["action"] += 1
+                current_state["action"] += 1
                 board.dropBomb(man)
                 serge.sound.Sounds.play('drop')
 
