@@ -25,10 +25,10 @@ class bombrtrain:
       for i in range(len(self.sequence)):
          for j in range(len(self.sequence[i])):
             if(self.check_duplicate(last_state_action_pair, self.sequence[i][j])):
-               self.states.append(self.sequence[i][j]['St'])
-               self.actions.append(self.sequence[i][j]['At'])
-    
-    def getDataDistribution(self):
+         		self.states.append(self.sequence[i][j]['St'])
+         		self.actions.append(self.sequence[i][j]['At'])
+   
+   def getDataDistribution(self):
         self.parse_policy_train_data()
         self.act_Distribution = np.zeros(10)
         for i in range(len(self.actions)):
