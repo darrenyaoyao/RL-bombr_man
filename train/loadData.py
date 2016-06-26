@@ -5,7 +5,7 @@ BOMBR_ROW = 19
 #FINALSTATE = np.full((19,19),3.0)
 FINALSTATE = np.full(361,3.0)
 REWARD = 0
-ACTION_PERCENT_RETAIN = 0.1
+ACTION_PERCENT_RETAIN = 0.2
 
 class loadData:
     def __init__(self, option):
@@ -38,7 +38,6 @@ class loadData:
     def check_duplicate(self, data):
         if (data[-1]['St'] == data[-2]['St']).all() and (data[-1]['At'] == data[-2]['At']).all() and (data[-1]['Rt1'] == data[-2]['Rt1']):
             data.pop(-2)
-            print("duplicate occur")
             return True
         else:
             return False
@@ -65,7 +64,6 @@ class loadData:
                     #state = np.reshape( timeslice[1:], (BOMBR_ROW, BOMBR_COLUMN))
                     state = timeslice[1:]
                     info = {'St':state , 'Rt1':REWARD}
-                    print(counter)
                     if counter != 0:
                         data[counter-1]['At']=action
                         data[counter-1]['St1']=state
