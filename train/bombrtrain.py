@@ -28,7 +28,11 @@ class bombrtrain:
                self.actions.append(self.sequence[i][j]['At'])
 
    def check_duplicate(self, last_state_action_pair, data):
-      if (data['At'] == np.zeros(10)).all() and (data['St'] == last_state_action_pair[0]).all() and (data['At'] == last_state_action_pair[1]).all():
+      action0 = np.zeros(10)
+      action0[0] = 1
+      if (data['At'] == action0).all() and (data['St'] == last_state_action_pair[0]).all() and (data['At'] == last_state_action_pair[1]).all():
+         return False
+      elif (data['At'] == action0).all():
          return False
       else:
          last_state_action_pair[0] = data['St']
@@ -82,7 +86,9 @@ class bombrtrain:
       data.pop()
       return data
 
-   def models_policy_train(self):
+   def models_policy_train(self, load_weights):
+      if load_weights:
+         self.model.load_weights("model_weight.h5")
       self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
       self.model.summary()
       callbacks = [
