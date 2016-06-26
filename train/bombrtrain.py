@@ -13,9 +13,10 @@ class bombrtrain:
    def __init__(self, option):
       self.obser_file = option.obser
       self.reward_file = option.reward
-      self.models_init()
+      #self.models_init()
       self.data_init()
-      self.parse_policy_train_data()
+      self.getDataDistribution()
+      #self.parse_policy_train_data()
 
    def parse_policy_train_data(self):
       self.states = []
@@ -26,14 +27,20 @@ class bombrtrain:
             if(self.check_duplicate(last_state_action_pair, self.sequence[i][j])):
                self.states.append(self.sequence[i][j]['St'])
                self.actions.append(self.sequence[i][j]['At'])
+    
+    def getDataDistribution(self):
+        self.parse_policy_train_data()
+        self.act_Distribution = np.zeros(10)
+        for i in range(len(self.actions)):
+            self.act_Distribution = self.act_Distribution + self.actions[i]
 
    def check_duplicate(self, last_state_action_pair, data):
       action0 = np.zeros(10)
       action0[0] = 1
       if (data['At'] == action0).all() and (data['St'] == last_state_action_pair[0]).all() and (data['At'] == last_state_action_pair[1]).all():
          return False
-      elif (data['At'] == action0).all():
-         return False
+      #elif (data['At'] == action0).all():
+      #   return False
       else:
          last_state_action_pair[0] = data['St']
          last_state_action_pair[1] = data['At']
