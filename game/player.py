@@ -68,6 +68,11 @@ class Player(object):
                 current_state["action"] += 1
                 board.dropBomb(man)
                 serge.sound.Sounds.play('drop')
+        elif self.bomb:
+            if man.canDropBomb():
+                board.dropBomb(man)
+                serge.sound.Sounds.play('drop')
+                self.bomb = False
         elif self.keyboard.isClicked(pygame.K_SPACE):
             if man.canDropBomb():
                 current_state["action"] += 1
@@ -103,10 +108,10 @@ class Player(object):
             return (+1, 0)
         elif action == 6 or action ==7:
             agent_dic["action"] = 6
-            return (0, -1)
+            return (0, +1)
         elif action == 8 or action ==9:
             agent_dic["action"] = 8
-            return (0, +1)
+            return (0, -1)
         else:
             return None
 
