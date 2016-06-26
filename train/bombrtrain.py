@@ -30,10 +30,10 @@ class bombrtrain:
    def check_duplicate(self, last_state_action_pair, data):
       action0 = np.zeros(10)
       action0[0] = 1
-      if (data['At'] == action0).all() and (data['St'] == last_state_action_pair[0]).all() and (data['At'] == last_state_action_pair[1]).all():
+      if (data['St'] == last_state_action_pair[0]).all() and (data['At'] == last_state_action_pair[1]).all():
          return False
-      elif (data['At'] == action0).all():
-         return False
+      #elif (data['At'] == action0).all():
+      #   return False
       else:
          last_state_action_pair[0] = data['St']
          last_state_action_pair[1] = data['At']
@@ -86,19 +86,19 @@ class bombrtrain:
       data.pop()
       return data
 
-   def models_policy_train(self, load_weights):
+   def models_policy_train(self, epoch, out_weights_file, load_weights=False, in_weights_file=None):
       if load_weights:
-         self.model.load_weights("model_weight.h5")
+         self.model.load_weights(in_weights_file)
       self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
       self.model.summary()
       callbacks = [
           EarlyStopping(monitor='val_loss', patience=5, verbose=0),
-          ModelCheckpoint(filepath="model_weight.h5", monitor='val_loss', save_best_only=True, verbose=0)
+          ModelCheckpoint(filepath=out_weights_file, monitor='val_loss', save_best_only=True, verbose=0)
       ]
-      self.model.fit(np.asarray(self.states), np.asarray(self.actions), batch_size=128, nb_epoch=20, verbose=1, validation_split=0.1, callbacks=callbacks)
+      self.model.fit(np.asarray(self.states), np.asarray(self.actions), batch_size=128, nb_epoch=epoch, verbose=1, validation_split=0.1, callbacks=callbacks)
 
-   def test_predict(self):
-      self.model.load_weights("model_weight.h5")
+   def test_predict(self, weights_file):
+      self.model.load_weights(weight_file)
       self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
       for x in self.states:
          state = np.zeros((1, BOMBR_ROW, BOMBR_COLUMN))
