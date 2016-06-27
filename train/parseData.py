@@ -5,7 +5,7 @@ BOMBR_ROW = 19
 FINALSTATE = np.full((19,19),3.0)
 #FINALSTATE = np.full(361,3.0)
 REWARD = 0
-ACTION_PERCENT_RETAIN = 0.2
+#ACTION_PERCENT_RETAIN = 0.2
 
 class parseData:
     def __init__(self, option):
@@ -23,12 +23,15 @@ class parseData:
         action0[0] = 1
         for i in range(len(self.sequence)):
             for j in range(len(self.sequence[i])):
+                if j < 70:
+                    ACTION_PERCENT_RETAIN = 0.1
+                else:
+                    ACTION_PERCENT_RETAIN = 0.25
                 if ((self.sequence[i][j]['At']==action0).all()) and (random.random() > ACTION_PERCENT_RETAIN):
                     pass
                 else:
-                    if j > 70:
-                        self.states.append(self.sequence[i][j]['St'])
-                        self.actions.append(self.sequence[i][j]['At'])
+                    self.states.append(self.sequence[i][j]['St'])
+                    self.actions.append(self.sequence[i][j]['At'])
 
     def getDataDistribution(self):
         try:

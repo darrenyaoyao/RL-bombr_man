@@ -43,7 +43,7 @@ theme.load({
     'screenshot-interval': 5,
 
     # Simulation properties
-    'simulation-on': True,
+    'simulation-on': False,
     'simulation-rtf': 10,
     'simulation-fps': 1,
     'simulation-auto-restart': False,
@@ -132,7 +132,7 @@ theme.load({
     'ai-bomb-probability': 0.5,
     'ai-squares-view': 2,
     'ai-look-ahead': 2,
-    'all-ai': True,
+    'all-ai': False,
     'ai-show-destinations': True,
     'ai-show-unsafe': True,
     'ai-unsafe-colour': (0, 0, 0, 100),
