@@ -9,7 +9,5 @@ parser.add_argument('-O', action="store", dest='obser')
 parser.add_argument('-W', action="store", dest='reward')
 
 Bombr_train = bombrtrain(parser.parse_args())
-#Bombr_train.models_policy_train(LOAD_WEIGHTS)
+Bombr_train.models_policy_train(200, "with_action0_model_weight.h5", LOAD_WEIGHTS, "with_action0_model_weight.h5")
 #Bombr_train.test_predict()
-Bombr_train.dqnmodel_init()
-Bombr_train.dqn_train()
