@@ -62,7 +62,7 @@ class bombrtrain:
             action = self.model.predict_classes(state)
             print (action)
 
-    def dqnmodel_init(self):
+    def dqnmodel_init(self, load_weights=False, weights_file="../dqnmodel_weight.h5"):
       self.seq = np.load(self.option.seq)
       self.dqn_datainit()
       state_model = Sequential()
@@ -82,9 +82,9 @@ class bombrtrain:
       final_model.add(merged)
       final_model.add(Dense(200, activation='relu'))
       final_model.add(Dense(200, activation='relu'))
-      final_model.add(Dense(1))
+      final_model.add(Dense(1, activation='linear'))
       open('dqnmodel.json', 'w').write(final_model.to_json())
-      self.dqnmodel = DQN(final_model)
+      self.dqnmodel = DQN(final_model, load_weights, weights_file)
 
     def dqn_datainit(self):
       self.all_action = list()
@@ -96,6 +96,20 @@ class bombrtrain:
       for i in range(len(self.seq)):
         for j in range(len(self.seq[i])):
           self.dqn_data.append(self.seq[i][j])
+          print "i: "+str(i)+"  j: "+str(j)
+          print self.seq[i][j]['Rt1']
 
     def dqn_train(self):
       self.dqnmodel.train(self.dqn_data, self.all_action, 0.9)
+
+    def dqn_train_test(self):
+      for game in self.seq:
+        print "Game final reward: " + str(game[-1]['Rt1'])
+        for data in game:
+          x = np.zeros((1, BOMBR_ROW, BOMBR_COLUMN))
+          x[0] = data['St']
+          a = np.zeros((1, 10))
+          a[0] = data['At']
+          Q = self.dqnmodel.predict([x, a])
+          if int(game[-1]['Rt1']) == -1:
+            print Q
