@@ -13,6 +13,7 @@ class parseData:
         self.reward_file = option.reward
         self.save_state = option.state
         self.save_action = option.action
+        self.seq = option.seq
         self.data_init()
 
     def policy_train_data(self):
@@ -89,5 +90,7 @@ class parseData:
     def save_npy(self):
         states = np.asarray(self.states)
         actions = np.asarray(self.actions)
+        sequence = np.asarray(self.sequence)
         np.save(self.save_state, states)
         np.save(self.save_action, actions)
+        np.save(self.seq, sequence)

@@ -35,15 +35,17 @@ class DQN:
       ]
       self.save_model_weight()
       for x in range(nb_epoch):
+         print "epoch"+str(x)+"/"+str(nb_epoch)
          self.update_evalute_model_weight()
          self.update_target(rewards, next_states)
-         self.model.fit([states, actions], self.targets, batch_size, nb_iter)
+         self.model.fit([states, actions], self.targets, batch_size, nb_iter, verbose=1, validation_split=0.1, callbacks=callbacks)
          self.save_model_weight()
 
    def update_target(self, reward, next_state):
       self.targets = []
       for i in range(len(reward)):
-         self.targets.append(reward[i]+self.gamma*self.get_maxQ(next_state[i]))
+         a = self.get_maxQ(next_state[i])
+         self.targets.append((np.int32)(reward[i])+self.gamma*a)
 
    def save_model_weight(self):
       self.model_weights = []
@@ -62,5 +64,8 @@ class DQN:
       x = np.zeros((1, BOMBR_ROW, BOMBR_COLUMN))
       x[0] = state
       for action in self.actions:
-         maxQ = max(maxQ, self.evalute_model.predict([x, action]))
+         a = np.zeros((1, 10))
+         a[0] = action
+         Q = self.evalute_model.predict([x, a])
+         maxQ = max(maxQ, Q[0][0])
       return maxQ

@@ -10,6 +10,7 @@ ACTION_CLASSES = 10
 
 class bombrtrain:
     def __init__(self, option):
+        self.option = option
         self.obser_file = option.obser
         self.reward_file = option.reward
         self.model = option.model
@@ -61,7 +62,9 @@ class bombrtrain:
             action = self.model.predict_classes(state)
             print (action)
 
-   def dqnmodel_init(self):
+    def dqnmodel_init(self):
+      self.seq = np.load(self.option.seq)
+      self.dqn_datainit()
       state_model = Sequential()
       state_model.add(Reshape((1, BOMBR_ROW, BOMBR_COLUMN), input_shape=(BOMBR_ROW, BOMBR_COLUMN)))
       state_model.add(Convolution2D(64, 3, 3, activation='relu'))
@@ -83,5 +86,16 @@ class bombrtrain:
       open('dqnmodel.json', 'w').write(final_model.to_json())
       self.dqnmodel = DQN(final_model)
 
-   def dqn_train(self):
+    def dqn_datainit(self):
+      self.all_action = list()
+      for i in range(10):
+        action = np.zeros(10)
+        action[i] = 1
+        self.all_action.append(action)
+      self.dqn_data = list()
+      for i in range(len(self.seq)):
+        for j in range(len(self.seq[i])):
+          self.dqn_data.append(self.seq[i][j])
+
+    def dqn_train(self):
       self.dqnmodel.train(self.dqn_data, self.all_action, 0.9)
