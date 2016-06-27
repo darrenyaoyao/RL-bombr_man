@@ -40,7 +40,7 @@ class DQN:
       ]
       self.save_model_weight()
       for x in range(nb_epoch):
-         print "epoch"+str(x)+"/"+str(nb_epoch)
+         print "All Date Epoch "+str(x)+"/"+str(nb_epoch)
          self.update_evalute_model_weight()
          self.update_target(rewards, next_states)
          print "Start fit"
@@ -51,8 +51,11 @@ class DQN:
    def update_target(self, reward, next_state):
       self.targets = []
       for i in range(len(reward)):
-         a = self.get_maxQ(next_state[i])
-         self.targets.append((np.int32)(reward[i])+self.gamma*a)
+         if next_state[i] == FINALSTATE:
+            self.targets.append(reward[i])
+         else:
+            a = self.get_maxQ(next_state[i])
+            self.targets.append(reward[i]+self.gamma*a)
       self.targets = np.array(self.targets)
 
    def save_model_weight(self):
