@@ -1,4 +1,7 @@
 *.obser
 *.reward
 *.pyc
-
+*/*.pyc
+*/*/*.pyc
+*.npy
+*/*.npy
