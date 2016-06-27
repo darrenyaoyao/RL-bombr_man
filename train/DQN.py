@@ -15,8 +15,8 @@ class DQN:
          self.model.load_weights(weight_file)
          self.evalute_model.load_weights(weight_file)
 
-   def train(self, data, actions, gamma, batch_size=128, nb_epoch=80,
-         nb_iter=40, optimizer=SGD(lr=0.001, decay=1e-6, momentum=0.9, nesterov=True)):
+   def train(self, data, actions, gamma, batch_size=64, nb_epoch=10,
+         nb_iter=20, optimizer='adam'):
       self.actions = actions
       self.optimizer = optimizer
       self.gamma = gamma
@@ -43,24 +43,26 @@ class DQN:
          self.update_evalute_model_weight()
          self.update_target(rewards, next_states)
          print "Start fit"
-         self.model.fit([states, actions], self.targets, batch_size, nb_iter, verbose=1, validation_split=0.1, callbacks=callbacks)
+         print self.targets
+         self.model.fit([states, actions], self.targets, batch_size, nb_iter, verbose=1, validation_split=0.05, callbacks=callbacks)
          print "Finish fit"
          self.save_model_weight()
+      self.model.save_weight('dqn.h5')
 
    def update_target(self, reward, next_state):
       self.targets = []
       for i in range(len(reward)):
          if (next_state[i] == FINALSTATE).all():
             self.targets.append(reward[i])
-            #print reward[i]
-            if i < 50 and i > 0:
+            print reward[i]
+            if i < 20 and i > 0:
                 print reward[i]
          else:
             a = self.get_maxQ(next_state[i])
             self.targets.append(reward[i]+self.gamma*a)
-            if i < 50 and i > 0:
+            if i < 20 and i > 0:
                 print reward[i]+self.gamma*a
-            #print reward[i]+self.gamma*a
+            print reward[i]+self.gamma*a
       self.targets = np.array(self.targets)
 
    def save_model_weight(self):

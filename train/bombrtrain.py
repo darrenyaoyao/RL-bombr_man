@@ -95,7 +95,7 @@ class bombrtrain:
       self.dqn_data = list()
       for i in range(len(self.seq)):
         for j in range(len(self.seq[i])):
-          if (len(self.seq[i])-j) < 5 :
+          if (len(self.seq[i])-j) < 3 and self.seq[i][-1]['Rt1'] == 1:
             self.dqn_data.append(self.seq[i][j])
 
     def dqn_train(self):
@@ -103,13 +103,12 @@ class bombrtrain:
 
     def dqn_train_test(self):
       for game in self.seq:
-        print "Game final reward: " + str(game[-1]['Rt1'])
         for i in range(len(game)):
-          if (len(game)-i) < 5 :
+          if (len(game)-i) < 3 :
+            print "Game final reward: " + str(game[-1]['Rt1'])
             x = np.zeros((1, BOMBR_ROW, BOMBR_COLUMN))
             x[0] = game[i]['St']
             a = np.zeros((1, 10))
             a[0] = game[i]['At']
             Q = self.dqnmodel.predict([x, a])
-            if game[-1]['Rt1'] == -1:
-              print Q[0][0]
+            print Q[0][0]
