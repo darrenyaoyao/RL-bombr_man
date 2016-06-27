@@ -1,4 +1,5 @@
 *.obser
 *.reward
 *.pyc
-
+*/*.pyc
+*/*/*,pyc

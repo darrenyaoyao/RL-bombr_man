@@ -10,4 +10,6 @@ parser.add_argument('-W', action="store", dest='reward')
 
 Bombr_train = bombrtrain(parser.parse_args())
 #Bombr_train.models_policy_train(LOAD_WEIGHTS)
-Bombr_train.test_predict()
+#Bombr_train.test_predict()
+Bombr_train.dqnmodel_init()
+Bombr_train.dqn_train()

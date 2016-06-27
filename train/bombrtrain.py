@@ -1,8 +1,9 @@
 from keras.models import Sequential
-from keras.layers.core import Dense, Dropout, Flatten, Reshape
+from keras.layers.core import Dense, Dropout, Flatten, Reshape, Merge
 from keras.layers.convolutional import Convolution2D
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 import numpy as np
+from DQN import DQN
 BOMBR_COLUMN = 19
 BOMBR_ROW = 19
 FINALSTATE = np.full((19,19),3.0)
@@ -16,16 +17,26 @@ class bombrtrain:
       self.models_init()
       self.data_init()
       self.parse_policy_train_data()
+      self.create_all_action()
+
+   def create_all_action(self):
+      self.all_action = []
+      for i in range(10):
+         action = np.zeros(10,)
+         action[i] = 1
+         self.all_action.append(action)
 
    def parse_policy_train_data(self):
       self.states = []
       self.actions = []
+      self.dqn_data = []
       last_state_action_pair = [FINALSTATE, np.zeros(10)]
       for i in range(len(self.sequence)):
          for j in range(len(self.sequence[i])):
             if(self.check_duplicate(last_state_action_pair, self.sequence[i][j])):
                self.states.append(self.sequence[i][j]['St'])
                self.actions.append(self.sequence[i][j]['At'])
+               self.dqn_data.append(self.sequence[i][j])
 
    def check_duplicate(self, last_state_action_pair, data):
       action0 = np.zeros(10)
@@ -105,3 +116,28 @@ class bombrtrain:
          state[0] = x
          action = self.model.predict_classes(state)
          print (action)
+
+   def dqnmodel_init(self):
+      state_model = Sequential()
+      state_model.add(Reshape((1, BOMBR_ROW, BOMBR_COLUMN), input_shape=(BOMBR_ROW, BOMBR_COLUMN)))
+      state_model.add(Convolution2D(64, 3, 3, activation='relu'))
+      state_model.add(Convolution2D(64, 3, 3, activation='relu'))
+      state_model.add(Dropout(0.25))
+      state_model.add(Flatten())
+      state_model.add(Dense(128, activation='relu'))
+
+      action_model = Sequential()
+      action_model.add(Dense(32, input_shape=(10,), activation='relu'))
+      action_model.add(Dense(32, activation='relu'))
+
+      merged = Merge([state_model, action_model], mode='concat')
+      final_model = Sequential()
+      final_model.add(merged)
+      final_model.add(Dense(200, activation='relu'))
+      final_model.add(Dense(200, activation='relu'))
+      final_model.add(Dense(1))
+      open('dqnmodel.json', 'w').write(final_model.to_json())
+      self.dqnmodel = DQN(final_model)
+
+   def dqn_train(self):
+      self.dqnmodel.train(self.dqn_data, self.all_action, 0.9)
