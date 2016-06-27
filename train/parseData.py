@@ -56,6 +56,8 @@ class parseData:
         for r in RewardFile.readlines():
             strings = ObserFile.readline()
             ori_data = self.spliter(strings, "  ")
+            #length_separate = len(ori_data)/5
+            #separate each seq into five segment
             #every time step's data
             data = list()
             counter = 0
@@ -74,7 +76,8 @@ class parseData:
                 else:
                     data[counter-1]['At'] = action
                     data[counter-1]['St1'] = FINALSTATE
-                    data[counter-1]['Rt1'] = r
+                    rew = int(r.replace("\n",""))
+                    data[counter-1]['Rt1'] = rew
                 if len(data) > 1:
                     if(self.check_duplicate(data)):
                         counter = counter-1
