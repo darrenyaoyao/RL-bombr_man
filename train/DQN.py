@@ -16,7 +16,7 @@ class DQN:
          self.evalute_model.load_weights(weight_file)
 
    def train(self, data, actions, gamma, batch_size=4, nb_epoch=10, 
-         nb_iter=10, optimizer=SGD(lr=0.001, decay=1e-6, momentum=0.9, nesterov=True)):
+         nb_iter=10, optimizer='adam'):
       self.actions = actions
       self.optimizer = optimizer
       self.gamma = gamma
@@ -44,6 +44,7 @@ class DQN:
          self.update_evalute_model_weight()
          self.update_target(rewards, next_states)
          print "Start fit"
+         print self.targets
          self.model.fit([states, actions], self.targets, batch_size, nb_iter, verbose=1, validation_split=0.1, callbacks=callbacks)
          print "Finish fit"
          self.save_model_weight()
