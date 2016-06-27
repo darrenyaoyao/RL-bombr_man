@@ -2,4 +2,6 @@
 *.reward
 *.pyc
 */*.pyc
-*/*/*,pyc
+*/*/*.pyc
+*.npy
+*/*.npy
