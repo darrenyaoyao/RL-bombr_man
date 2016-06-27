@@ -15,8 +15,8 @@ class DQN:
          self.model.load_weights(weight_file)
          self.evalute_model.load_weights(weight_file)
 
-   def train(self, data, actions, gamma, batch_size=4, nb_epoch=10, 
-         nb_iter=10, optimizer=SGD(lr=0.001, decay=1e-6, momentum=0.9, nesterov=True)):
+   def train(self, data, actions, gamma, batch_size=128, nb_epoch=80,
+         nb_iter=40, optimizer=SGD(lr=0.001, decay=1e-6, momentum=0.9, nesterov=True)):
       self.actions = actions
       self.optimizer = optimizer
       self.gamma = gamma
@@ -30,12 +30,11 @@ class DQN:
          actions.append(d['At'])
          next_states.append(d['St1'])
       states = np.array(states)
-      actions = np.array(actions)   
+      actions = np.array(actions)
 
       self.model.compile(loss='mean_squared_error', optimizer=optimizer)
       self.model.summary()
       callbacks = [
-         EarlyStopping(monitor='val_loss', patience=5, verbose=0),
          ModelCheckpoint(filepath="dqnmodel_weight.h5", monitor='val_loss', save_best_only=True, verbose=0)
       ]
       self.save_model_weight()
@@ -53,11 +52,15 @@ class DQN:
       for i in range(len(reward)):
          if (next_state[i] == FINALSTATE).all():
             self.targets.append(reward[i])
-            print reward[i]
+            #print reward[i]
+            if i < 50 and i > 0:
+                print reward[i]
          else:
             a = self.get_maxQ(next_state[i])
             self.targets.append(reward[i]+self.gamma*a)
-            print reward[i]+self.gamma*a
+            if i < 50 and i > 0:
+                print reward[i]+self.gamma*a
+            #print reward[i]+self.gamma*a
       self.targets = np.array(self.targets)
 
    def save_model_weight(self):

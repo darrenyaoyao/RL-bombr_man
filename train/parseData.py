@@ -26,9 +26,9 @@ class parseData:
                 if ((self.sequence[i][j]['At']==action0).all()) and (random.random() > ACTION_PERCENT_RETAIN):
                     pass
                 else:
-                    self.states.append(self.sequence[i][j]['St'])
-                    self.actions.append(self.sequence[i][j]['At'])
-        print len(self.states)
+                    if j > 70:
+                        self.states.append(self.sequence[i][j]['St'])
+                        self.actions.append(self.sequence[i][j]['At'])
 
     def getDataDistribution(self):
         try:
