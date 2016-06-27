@@ -1,4 +1,4 @@
-from keras.models import Sequential
+from keras.models import Sequential, model_from_json
 from keras.layers.core import Dense, Dropout, Flatten, Reshape
 from keras.layers.convolutional import Convolution2D
 from keras.callbacks import EarlyStopping, ModelCheckpoint
@@ -17,6 +17,8 @@ class bombrtrain:
         self.action_data = option.action
         if self.model == None:
             self.models_init()
+        else:
+            self.model = model_from_json(open(self.model).read())
 
     def models_init(self):
         self.model = Sequential()
@@ -44,10 +46,10 @@ class bombrtrain:
         self.states = self.states[indices]
         self.actions = self.actions[indices]
         callbacks = [
-            EarlyStopping(monitor='val_loss', patience=5, verbose=0),
+            EarlyStopping(monitor='val_loss', patience=10, verbose=0),
             ModelCheckpoint(filepath=self.weights, monitor='val_loss', save_best_only=True, verbose=0)
         ]
-        self.model.fit(self.states, self.actions, batch_size=128, nb_epoch=20, verbose=1, validation_split=0.1, callbacks=callbacks)
+        self.model.fit(self.states, self.actions, batch_size=128, nb_epoch=50, verbose=1, validation_split=0.1, callbacks=callbacks)
 
     def test_predict(self):
         self.model.load_weights(self.weights)

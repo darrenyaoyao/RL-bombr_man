@@ -40,7 +40,7 @@ class Player(object):
         elif board.options.supervised_policy:
             direction = self.supervised_policy(last_state)
         else:
-            direction = None       
+            direction = None
             if self.keyboard.isDown(pygame.K_LEFT):
                 direction = (-1, 0)
                 current_state["action"] = 2
@@ -53,7 +53,7 @@ class Player(object):
             if self.keyboard.isDown(pygame.K_DOWN):
                 direction = (0, +1)
                 current_state["action"] = 8
-        
+
         #
         # Check that we can go there
         if direction and board.canMove(man, direction) and time.time() - self._last_move > self._move_interval:
@@ -129,10 +129,10 @@ class Player(object):
             return (+1, 0)
         elif a == 3:
             agent_dic["action"] = 6
-            return (0, -1)
+            return (0, +1)
         elif a == 4:
             agent_dic["action"] = 8
-            return (0, +1)
+            return (0, -1)
         else:
             agent_dic["action"] = 0
             return None
