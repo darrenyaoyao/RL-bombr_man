@@ -5,13 +5,18 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint
 import numpy as np
 BOMBR_COLUMN = 19
 BOMBR_ROW = 19
+ACTION_CLASSES = 10
 
 class bombrtrain:
     def __init__(self, option):
         self.obser_file = option.obser
         self.reward_file = option.reward
-        #self.models_init()
-        #self.parse_policy_train_data()
+        self.model = option.model
+        self.weights = option.weights
+        self.state_data = option.state
+        self.action_data = option.action
+        if self.model == None:
+            self.models_init()
 
     def models_init(self):
         self.model = Sequential()
@@ -25,16 +30,27 @@ class bombrtrain:
         self.model.add(Dense(ACTION_CLASSES, activation='softmax'))
         open('model.json', 'w').write(self.model.to_json())
 
-    def models_policy_train(self, load_weights):
-        if load_weights:
-            self.model.load_weights("model_weight.h5")
-            self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-            self.model.summary()
-            callbacks = [EarlyStopping(monitor='val_loss', patience=5, verbose=0),ModelCheckpoint(filepath="model_weight.h5", monitor='val_loss', save_best_only=True, verbose=0)]
-            self.model.fit(np.asarray(self.states), np.asarray(self.actions), batch_size=128, nb_epoch=20, verbose=1, validation_split=0.1, callbacks=callbacks)
+    def models_policy_train(self):
+        if self.weights != None:
+            self.model.load_weights(self.weights)
+        else:
+            self.weights = 'model_weight.h5'
+        self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+        self.model.summary()
+        self.states = np.load(self.state_data)
+        self.actions = np.load(self.action_data)
+        indices = np.arange(len(self.states))
+        np.random.shuffle(indices)
+        self.states = self.states[indices]
+        self.actions = self.actions[indices]
+        callbacks = [
+            EarlyStopping(monitor='val_loss', patience=5, verbose=0),
+            ModelCheckpoint(filepath=self.weights, monitor='val_loss', save_best_only=True, verbose=0)
+        ]
+        self.model.fit(self.states, self.actions, batch_size=128, nb_epoch=20, verbose=1, validation_split=0.1, callbacks=callbacks)
 
     def test_predict(self):
-        self.model.load_weights("model_weight.h5")
+        self.model.load_weights(self.weights)
         self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         for x in self.states:
             state = np.zeros((1, BOMBR_ROW, BOMBR_COLUMN))
