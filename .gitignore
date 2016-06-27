@@ -1,2 +1,4 @@
 *.obser
 *.reward
+*.pyc
+

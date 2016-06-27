@@ -50,6 +50,8 @@ parser.add_option("-W", "--reward", dest="reward", default="default.reward", typ
                   help="reward output")
 parser.add_option("-R", "--random", dest="random", default=False, action="store_true",
                   help="random policy")
+parser.add_option("-P", "--supervised_policy", dest="supervised_policy", default=False, action="store_true",
+                  help="supervised_policy")
 
 observation = [{"action": 0, "observation": []}]
 (options, args) = parser.parse_args()

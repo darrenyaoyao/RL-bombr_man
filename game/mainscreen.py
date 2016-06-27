@@ -440,12 +440,28 @@ class MainScreen(serge.blocks.actors.ScreenActor):
         self.music = serge.sound.Music.getItem(common.levels.LEVELS[self.current_level - 1][1])
         #
         # Add the player
+        
         self.player = serge.blocks.utils.addActorToWorld(
             self.world,
             man.Man('man', 'player', 'tiles-6', self.board,
                     ai.AI() if G('all-ai') else player.Player()),
             layer_name='men'
         )
+
+        '''
+        self.ai = serge.blocks.utils.addActorToWorld(
+            self.world,
+            man.Man('man', 'player', 'tiles-7', self.board, player.Player()),
+            layer_name='men'
+        )
+
+        self.player = serge.blocks.utils.addActorToWorld(
+            self.world,
+            man.Man('man', 'ai', 'tiles-6', self.board,
+                    ai.AI(self.ai)),
+            layer_name='men'
+        )'''
+
         self.player.spawnMan()
         self.player.linkEvent(common.E_MAN_DIED, self.playerDied)
         #
@@ -455,6 +471,7 @@ class MainScreen(serge.blocks.actors.ScreenActor):
             man.Man('man', 'ai', 'tiles-7', self.board, ai.AI(self.player)),
             layer_name='men'
         )
+
         self.ai.spawnMan()
         self.ai.linkEvent(common.E_MAN_DIED, self.aiDied)
         self.player.controller.enemy = self.ai
