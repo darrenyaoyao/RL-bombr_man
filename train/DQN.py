@@ -15,7 +15,7 @@ class DQN:
          self.model.load_weights(weight_file)
          self.evalute_model.load_weights(weight_file)
 
-   def train(self, data, actions, gamma, batch_size=32, nb_epoch=10, 
+   def train(self, data, actions, gamma, batch_size=4, nb_epoch=10, 
          nb_iter=10, optimizer=SGD(lr=0.001, decay=1e-6, momentum=0.9, nesterov=True)):
       self.actions = actions
       self.optimizer = optimizer
@@ -51,11 +51,13 @@ class DQN:
    def update_target(self, reward, next_state):
       self.targets = []
       for i in range(len(reward)):
-         if next_state[i] == FINALSTATE:
+         if (next_state[i] == FINALSTATE).all():
             self.targets.append(reward[i])
+            print reward[i]
          else:
             a = self.get_maxQ(next_state[i])
             self.targets.append(reward[i]+self.gamma*a)
+            print reward[i]+self.gamma*a
       self.targets = np.array(self.targets)
 
    def save_model_weight(self):

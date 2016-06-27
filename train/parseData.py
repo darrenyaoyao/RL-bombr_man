@@ -81,7 +81,8 @@ class parseData:
                 if len(data) > 1:
                     if(self.check_duplicate(data)):
                         counter = counter-1
-                data.append(info)
+                if len(timeslice) != 1:
+                    data.append(info)
                 counter = counter+1
             self.sequence.append(data)
 

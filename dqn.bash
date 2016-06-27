@@ -1,1 +1,1 @@
-python2 ./train/main.py -Q defaultsequence.npy
+python2 ./train/main.py -Q sequence.npy
