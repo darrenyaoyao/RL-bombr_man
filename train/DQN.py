@@ -15,7 +15,7 @@ class DQN:
          self.model.load_weights(weight_file)
          self.evalute_model.load_weights(weight_file)
 
-   def train(self, data, actions, gamma, batch_size=4, nb_epoch=10, 
+   def train(self, data, actions, gamma, batch_size=32, nb_epoch=10, 
          nb_iter=10, optimizer='adam'):
       self.actions = actions
       self.optimizer = optimizer
