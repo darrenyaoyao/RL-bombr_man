@@ -15,8 +15,8 @@ class DQN:
          self.model.load_weights(weight_file)
          self.evalute_model.load_weights(weight_file)
 
-   def train(self, data, actions, gamma, batch_size=64, nb_epoch=10,
-         nb_iter=20, optimizer='adam'):
+   def train(self, data, actions, gamma=0.999, batch_size=128, nb_epoch=200,
+         nb_iter=1, optimizer='adam'):
       self.actions = actions
       self.optimizer = optimizer
       self.gamma = gamma
@@ -24,13 +24,20 @@ class DQN:
       rewards = []
       actions = []
       next_states = []
-      for d in data:
+      '''for d in data:
          states.append(d['St'])
          rewards.append(d['Rt1'])
          actions.append(d['At'])
-         next_states.append(d['St1'])
-      states = np.array(states)
-      actions = np.array(actions)
+         next_states.append(d['St1'])'''
+      num = 1
+      for i in range(len(data)):
+        for j in range(len(data[i])-num, len(data[i])):
+            states.append(data[i][j]['St'])
+            rewards.append(data[i][j]['Rt1'])
+            actions.append(data[i][j]['At'])
+            next_states.append(data[i][j]['St1'])
+      npstates = np.array(states)
+      npactions = np.array(actions)
 
       self.model.compile(loss='mean_squared_error', optimizer=optimizer)
       self.model.summary()
@@ -42,27 +49,44 @@ class DQN:
          print "All Date Epoch "+str(x)+"/"+str(nb_epoch)
          self.update_evalute_model_weight()
          self.update_target(rewards, next_states)
+         print "Shuffle data"
+         indices = np.arange(len(self.targets))
+         np.random.shuffle(indices)
+         npstates = npstates[indices]
+         npacions = npactions[indices]
+         self.targets = self.targets[indices]
          print "Start fit"
          print self.targets
-         self.model.fit([states, actions], self.targets, batch_size, nb_iter, verbose=1, validation_split=0.05, callbacks=callbacks)
+         self.model.fit([npstates, npactions], self.targets, batch_size, nb_iter, verbose=1, validation_split=0.05, callbacks=callbacks)
          print "Finish fit"
          self.save_model_weight()
-      self.model.save_weight('dqn.h5')
+         #update_data
+         num += 1
+         for i in range(len(data)):
+             if len(data[i])-num >= 0:
+                 states.insert(0, data[i][len(data[i])-num]['St'])
+                 actions.insert(0, data[i][len(data[i])-num]['At'])
+                 rewards.insert(0, data[i][len(data[i])-num]['Rt1'])
+                 next_states.insert(0, data[i][len(data[i])-num]['St1'])
+         npstates = np.array(states)
+         npactions = np.array(actions)
+         self.model.save_weights('dqn.h5', overwrite=True)
 
    def update_target(self, reward, next_state):
       self.targets = []
+      x = np.zeros((10*len(reward), BOMBR_ROW, BOMBR_COLUMN))
+      a = np.zeros((10*len(reward), 10))
+      for i in range(len(reward)):
+        for j in range(10):
+            x[i*10+j] = next_state[i]
+            a[i*10+j] = self.actions[j]
+      Q = self.evalute_model.predict([x, a])
       for i in range(len(reward)):
          if (next_state[i] == FINALSTATE).all():
             self.targets.append(reward[i])
-            print reward[i]
-            if i < 20 and i > 0:
-                print reward[i]
          else:
-            a = self.get_maxQ(next_state[i])
+            a = self.get_maxQ(Q[10*i:10*(i+1)])
             self.targets.append(reward[i]+self.gamma*a)
-            if i < 20 and i > 0:
-                print reward[i]+self.gamma*a
-            print reward[i]+self.gamma*a
       self.targets = np.array(self.targets)
 
    def save_model_weight(self):
@@ -77,15 +101,10 @@ class DQN:
          i += 1
       self.evalute_model.compile(loss='mean_squared_error', optimizer=self.optimizer)
 
-   def get_maxQ(self, state):
+   def get_maxQ(self, Q):
       maxQ = float('-inf')
-      x = np.zeros((1, BOMBR_ROW, BOMBR_COLUMN))
-      x[0] = state
-      for action in self.actions:
-         a = np.zeros((1, 10))
-         a[0] = action
-         Q = self.evalute_model.predict([x, a])
-         maxQ = max(maxQ, Q[0][0])
+      for i in range(10):
+         maxQ = max(maxQ, Q[i][0])
       return maxQ
 
    def predict(self, data):

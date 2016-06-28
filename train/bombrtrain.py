@@ -71,17 +71,17 @@ class bombrtrain:
       state_model.add(Convolution2D(64, 3, 3, activation='relu'))
       state_model.add(Dropout(0.25))
       state_model.add(Flatten())
-      state_model.add(Dense(128, activation='relu'))
+      state_model.add(Dense(256, activation='relu'))
 
       action_model = Sequential()
       action_model.add(Dense(32, input_shape=(10,), activation='relu'))
-      action_model.add(Dense(32, activation='relu'))
+      action_model.add(Dense(64, activation='relu'))
 
       merged = Merge([state_model, action_model], mode='concat')
       final_model = Sequential()
       final_model.add(merged)
-      final_model.add(Dense(200, activation='relu'))
-      final_model.add(Dense(200, activation='relu'))
+      final_model.add(Dense(512, activation='relu'))
+      final_model.add(Dense(512, activation='relu'))
       final_model.add(Dense(1, activation='linear'))
       open('dqnmodel.json', 'w').write(final_model.to_json())
       self.dqnmodel = DQN(final_model, load_weights, weights_file)
@@ -99,7 +99,7 @@ class bombrtrain:
             self.dqn_data.append(self.seq[i][j])
 
     def dqn_train(self):
-      self.dqnmodel.train(self.dqn_data, self.all_action, 0.95)
+      self.dqnmodel.train(self.seq, self.all_action, 0.999)
 
     def dqn_train_test(self):
       for game in self.seq:
