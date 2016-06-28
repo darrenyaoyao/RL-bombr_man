@@ -14,5 +14,7 @@ parser.add_argument('-A', action="store", dest='action')
 parser.add_argument('-Q', action="store", dest='seq')
 
 Bombr_train = bombrtrain(parser.parse_args())
-Bombr_train.dqnmodel_init()
+Bombr_train.dqnmodel_init(LOAD_WEIGHTS, "dqnmodel_weight.h5")
+#Bombr_train.dqnmodel_init()
+#Bombr_train.dqn_train_test()
 Bombr_train.dqn_train()
