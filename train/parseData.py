@@ -18,23 +18,33 @@ class parseData:
         self.data_init()
 
     def classified_train_data(self):
-        #classifed['X'][0]:states
-        #classifed['X'][1]:actions
-        self.classified = {'+1': [[],[]], '-1': [[],[]] }
+        #classified[0]: +1 [1] : -1
+        #classified['X'][0]:states
+        #classified['X'][1]:actions
+        self.classified =  [[[],[]],[[],[]]]
+        action0 = np.zeros(10)
+        action0[0] = 1
         flag = 0
         for i in range(len(self.sequence)):
             flag = self.sequence[i][-1]['Rt1']
             for j in range(len(self.sequence[i])):
-                 if flag == int(-1):
-                     if j < 70:
-                         self.classified['-1'][0].append(self.sequence[i][-j-1]['St'])
-                         self.classified['-1'][1].append(self.sequence[i][-j-1]['At'])
-                     else:
-                         self.classified['+1'][0].append(self.sequence[i][-j-1]['St'])
-                         self.classified['+1'][1].append(self.sequence[i][-j-1]['At'])
-                 else:
-                     self.classified['+1'][0].append(self.sequence[i][-j-1]['St'])
-                     self.classified['+1'][1].append(self.sequence[i][-j-1]['At'])
+                if j > 100:
+                    ACTION_PERCENT_RETAIN = 0.1
+                else:
+                    ACTION_PERCENT_RETAIN = 0.25
+                if ((self.sequence[i][-j-1]['At']==action0).all()) and (random.random() > ACTION_PERCENT_RETAIN):
+                    pass
+                else:
+                    if flag == int(-1):
+                        if j < 70:
+                            self.classified[1][0].append(self.sequence[i][-j-1]['St'])
+                            self.classified[1][1].append(self.sequence[i][-j-1]['At'])
+                        else:
+                            self.classified[0][0].append(self.sequence[i][-j-1]['St'])
+                            self.classified[0][1].append(self.sequence[i][-j-1]['At'])
+                    else:
+                        self.classified[0][0].append(self.sequence[i][-j-1]['St'])
+                        self.classified[0][1].append(self.sequence[i][-j-1]['At'])
 
 
     def policy_train_data(self):
@@ -107,7 +117,7 @@ class parseData:
         data.pop()
         return data
     
-    def save_classify(self):
+    def save_classify_data(self):
         classify = np.asarray(self.classified)
         if self.save_classify != None:
             np.save(self.save_classify, classify)
