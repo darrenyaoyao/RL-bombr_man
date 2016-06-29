@@ -57,7 +57,7 @@ class bombrtrain:
                 EarlyStopping(monitor='val_loss', patience=8, verbose=0),
                 ModelCheckpoint(filepath=self.weights, monitor='val_loss', save_best_only=True, verbose=0)
             ]
-            self.model.fit(self.states, self.actions, batch_size=128, nb_epoch=50, verbose=1, validation_split=0.1, callbacks=callbacks)
+            self.model.fit(self.states, self.actions, batch_size=128, nb_epoch=40, verbose=1, validation_split=0.1, callbacks=callbacks)
 
     def inverse_categorical_crossentropy(self, y_true, y_pred):
         return K.categorical_crossentropy(y_pred, y_true)**(-1)
