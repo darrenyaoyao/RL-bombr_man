@@ -32,13 +32,13 @@ class bombrtrain:
         self.model.add(Dense(128, activation='relu'))
         self.model.add(Dropout(0.5))
         self.model.add(Dense(ACTION_CLASSES, activation='softmax'))
-        open('model.json', 'w').write(self.model.to_json())
+        open('model_1.json', 'w').write(self.model.to_json())
 
     def models_policy_train(self):
         if self.weights != None:
             self.model.load_weights(self.weights)
         else:
-            self.weights = 'model_weight.h5'
+            self.weights = 'model_weight_1.h5'
         self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         self.model.summary()
         self.states = np.load(self.state_data)
