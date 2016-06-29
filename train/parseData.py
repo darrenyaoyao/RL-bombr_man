@@ -71,7 +71,19 @@ class parseData:
                 for i in range(len(self.actions)):
                     self.act_Distribution = self.act_Distribution + self.actions[i]
         except:
-            print("call parse function first")
+            print("error: call parse function first")
+
+    def getClassifyDistribution(self):
+        try:
+            if(self.classified != None):
+                self.act0_Distribution = np.zeros(10)
+                self.act1_Distribution = np.zeros(10)
+                for i in range(len(self.classified[0][1])):
+                    self.act0_Distribution = self.act0_Distribution + self.classified[0][1][i]
+                for i in range(len(self.classified[1][1])):
+                    self.act1_Distribution = self.act1_Distribution + self.classified[1][1][i]
+        except:
+            print("error: call parse function first")
 
     def check_duplicate(self, data):
         if (data[-3]['St'] == data[-2]['St']).all() and (data[-3]['At'] == data[-2]['At']).all() and (data[-3]['Rt1'] == data[-2]['Rt1']):
@@ -128,7 +140,7 @@ class parseData:
         if self.save_state != None and self.save_action != None:
             np.save(self.save_state, states)
             np.save(self.save_action, actions)
-    
+
     def save_sequence(self):
         sequence = np.asarray(self.sequence)
         if self.save_seq != None:
