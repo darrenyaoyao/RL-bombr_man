@@ -1,4 +1,4 @@
-for i in {1..500}
+for i in {1..50}
 do
-  python2 bombr.py -O ai_simulate.obser -W ai_simulate.reward
+  python2 bombr.py -Q -O dqn_1.obser -W dqn_1.reward
 done
