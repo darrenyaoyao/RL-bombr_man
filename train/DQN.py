@@ -7,16 +7,18 @@ BOMBR_COLUMN = 19
 BOMBR_ROW = 19
 
 class DQN:
-   def __init__(self, model, load_weight=False, weight_file="../dqnmodel_weight.h5"):
+   def __init__(self, model, load_weight=False, weight_file="./model/dqn_new_reward.h5"):
       self.model = model
       json_string = model.to_json()
+      self.weight_file = weight_file
+      print self.weight_file
       self.evalute_model = model_from_json(json_string)
       if load_weight:
          self.model.load_weights(weight_file)
          self.evalute_model.load_weights(weight_file)
 
    def train(self, data, actions, gamma=0.999, batch_size=128, nb_epoch=200,
-         nb_iter=1, optimizer='adam'):
+         nb_iter=20, optimizer='adam'):
       self.actions = actions
       self.optimizer = optimizer
       self.gamma = gamma
@@ -49,7 +51,7 @@ class DQN:
       self.model.compile(loss='mean_squared_error', optimizer=optimizer)
       self.model.summary()
       callbacks = [
-         ModelCheckpoint(filepath="dqnmodel_weight.h5", monitor='val_loss', save_best_only=True, verbose=0)
+         ModelCheckpoint(filepath=self.weight_file, monitor='loss', save_best_only=True, verbose=0)
       ]
       self.save_model_weight()
       for x in range(nb_epoch):
@@ -64,11 +66,11 @@ class DQN:
          self.targets = self.targets[indices]
          print "Start fit"
          print self.targets
-         self.model.fit([npstates, npactions], self.targets, batch_size, nb_iter, verbose=1, validation_split=0.05, callbacks=callbacks)
+         self.model.fit([npstates, npactions], self.targets, batch_size, nb_iter, verbose=1, validation_split=0, callbacks=callbacks)
          print "Finish fit"
          self.save_model_weight()
          #update_data
-         num += 1
+         '''num += 1
          for i in range(len(data)):
              if len(data[i])-num >= 0:
                  states.insert(0, data[i][len(data[i])-num]['St'])
@@ -76,8 +78,7 @@ class DQN:
                  rewards.insert(0, data[i][len(data[i])-num]['Rt1'])
                  next_states.insert(0, data[i][len(data[i])-num]['St1'])
          npstates = np.array(states)
-         npactions = np.array(actions)
-         self.model.save_weights('dqn.h5', overwrite=True)
+         npactions = np.array(actions)'''
 
    def update_target(self, reward, next_state):
       self.targets = []
@@ -94,6 +95,7 @@ class DQN:
          else:
             a = self.get_maxQ(Q[10*i:10*(i+1)])
             self.targets.append(reward[i]+self.gamma*a)
+            print reward[i]+self.gamma*a
       self.targets = np.array(self.targets)
 
    def save_model_weight(self):

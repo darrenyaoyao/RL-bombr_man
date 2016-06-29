@@ -2,6 +2,7 @@ from keras.models import Sequential
 from keras.layers.core import Dense, Dropout, Flatten, Reshape, Merge
 from keras.layers.convolutional import Convolution2D
 from keras.callbacks import EarlyStopping, ModelCheckpoint
+from keras.models import model_from_json
 import numpy as np
 from DQN import DQN
 BOMBR_COLUMN = 19
@@ -62,7 +63,7 @@ class bombrtrain:
             action = self.model.predict_classes(state)
             print (action)
 
-    def dqnmodel_init(self, load_weights=False, weights_file="../dqnmodel_weight.h5"):
+    def dqnmodel_init(self, load_weights=False, weights_file="./model/dqn_new_reward.h5"):
       self.seq = np.load(self.option.seq)
       self.dqn_datainit()
       state_model = Sequential()
@@ -103,9 +104,9 @@ class bombrtrain:
 
     def dqn_train_test(self):
       for game in self.seq:
+        print "Game final reward: " + str(game[-1]['Rt1'])
         for i in range(len(game)):
-          if (len(game)-i) < 3 :
-            print "Game final reward: " + str(game[-1]['Rt1'])
+          if (len(game)-i) < 15 :
             x = np.zeros((1, BOMBR_ROW, BOMBR_COLUMN))
             x[0] = game[i]['St']
             a = np.zeros((1, 10))
