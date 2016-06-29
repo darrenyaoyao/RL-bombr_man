@@ -81,7 +81,7 @@ class Player(object):
 
     def initialmodel(self):
         self.model = model_from_json(open("./train/npyNmodel/model.json").read())
-        self.model.load_weights("./train/npyNmodel/model_weight_policy.h5")
+        self.model.load_weights("./train/npyNmodel/model_weight_classified.h5")
         self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
     def supervised_policy(self, agent_dic):

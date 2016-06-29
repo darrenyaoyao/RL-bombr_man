@@ -41,6 +41,7 @@ class bombrtrain:
 
     def models_policy_train(self):
         if self.state_data != None and self.action_data != None :
+            print "start training policy supervised"
             if self.weights != None:
                 self.model.load_weights(self.weights)
             else:
@@ -64,6 +65,7 @@ class bombrtrain:
 
     def models_inforcement_train(self):
         if self.classified_data != None:
+            print "start training policy inforcement"
             if self.weights != None:
                 self.model.load_weights(self.weights)
             else:
