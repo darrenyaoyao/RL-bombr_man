@@ -49,10 +49,10 @@ class Player(object):
                 current_state["action"] = 4
             if self.keyboard.isDown(pygame.K_UP):
                 direction = (0, -1)
-                current_state["action"] = 6
+                current_state["action"] = 8
             if self.keyboard.isDown(pygame.K_DOWN):
                 direction = (0, +1)
-                current_state["action"] = 8
+                current_state["action"] = 6
 
         #
         # Check that we can go there
