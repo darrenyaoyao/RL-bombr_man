@@ -3,6 +3,7 @@ from keras.layers.core import Dense, Dropout, Flatten, Reshape, Merge
 from keras.layers.convolutional import Convolution2D
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras import backend as K
+from keras import model_from_json
 import numpy as np
 from DQN import DQN
 BOMBR_COLUMN = 19
@@ -92,7 +93,6 @@ class bombrtrain:
             self.states_1 = self.states_1[ind]
             self.actions_1 = self.actions_1[ind]
             self.model.fit(self.states_1, self.actions_1, batch_size=32, nb_epoch=25, verbose=1, validation_split=0.1, callbacks=callbacks)
->>>>>>> policy_inforcement finish
 
     def test_predict(self):
         self.model.load_weights(self.weights)
