@@ -71,17 +71,17 @@ class bombrtrain:
       state_model.add(Convolution2D(64, 3, 3, activation='relu'))
       state_model.add(Dropout(0.25))
       state_model.add(Flatten())
-      state_model.add(Dense(128, activation='relu'))
+      state_model.add(Dense(256, activation='relu'))
 
       action_model = Sequential()
       action_model.add(Dense(32, input_shape=(10,), activation='relu'))
-      action_model.add(Dense(32, activation='relu'))
+      action_model.add(Dense(64, activation='relu'))
 
       merged = Merge([state_model, action_model], mode='concat')
       final_model = Sequential()
       final_model.add(merged)
-      final_model.add(Dense(200, activation='relu'))
-      final_model.add(Dense(200, activation='relu'))
+      final_model.add(Dense(512, activation='relu'))
+      final_model.add(Dense(512, activation='relu'))
       final_model.add(Dense(1, activation='linear'))
       open('dqnmodel.json', 'w').write(final_model.to_json())
       self.dqnmodel = DQN(final_model, load_weights, weights_file)
@@ -95,21 +95,20 @@ class bombrtrain:
       self.dqn_data = list()
       for i in range(len(self.seq)):
         for j in range(len(self.seq[i])):
-          if (len(self.seq[i])-j) < 2 :
+          if (len(self.seq[i])-j) < 3 and self.seq[i][-1]['Rt1'] == 1:
             self.dqn_data.append(self.seq[i][j])
 
     def dqn_train(self):
-      self.dqnmodel.train(self.dqn_data, self.all_action, 0.95)
+      self.dqnmodel.train(self.seq, self.all_action, 0.999)
 
     def dqn_train_test(self):
       for game in self.seq:
-        print "Game final reward: " + str(game[-1]['Rt1'])
         for i in range(len(game)):
-          if (len(game)-i) < 2 :
+          if (len(game)-i) < 3 :
+            print "Game final reward: " + str(game[-1]['Rt1'])
             x = np.zeros((1, BOMBR_ROW, BOMBR_COLUMN))
             x[0] = game[i]['St']
             a = np.zeros((1, 10))
             a[0] = game[i]['At']
             Q = self.dqnmodel.predict([x, a])
-            if game[-1]['Rt1'] == 1:
-              print Q[0][0]
+            print Q[0][0]
