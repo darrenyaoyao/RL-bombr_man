@@ -76,7 +76,7 @@ class parseData:
                 else:
                     data[counter-1]['At'] = action
                     data[counter-1]['St1'] = FINALSTATE
-                    rew = int(r.replace("\n",""))
+                    rew = float(r.replace("\n",""))
                     data[counter-1]['Rt1'] = rew
                 if len(data) > 1:
                     if(self.check_duplicate(data)):
