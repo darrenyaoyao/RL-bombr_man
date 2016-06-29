@@ -26,6 +26,7 @@ class DQN:
       rewards = []
       actions = []
       next_states = []
+      index = []
       '''for d in data:
          states.append(d['St'])
          rewards.append(d['Rt1'])
@@ -45,6 +46,7 @@ class DQN:
                rewards.append(data[i][j]['Rt1'])
                actions.append(data[i][j]['At'])
                next_states.append(data[i][j]['St1'])
+         index.append(i)
       npstates = np.array(states)
       npactions = np.array(actions)
 
@@ -54,7 +56,7 @@ class DQN:
       for x in range(nb_epoch):
          print "All Date Epoch "+str(x)+"/"+str(nb_epoch)
          self.update_evalute_model_weight()
-         self.update_target(rewards, next_states)
+         self.update_target(actions, rewards, next_states, index)
          print "Shuffle data"
          #self.shuffle(npstates, npactions)
          print "Start fit"
@@ -70,11 +72,12 @@ class DQN:
                actions.append(data[i][len(data[i])-num]['At'])
                rewards.append(data[i][len(data[i])-num]['Rt1'])
                next_states.append(data[i][len(data[i])-num]['St1'])
+               index.append(i)
          npstates = np.array(states)
          npactions = np.array(actions)
-         self.model.save_weights(self.weight_file)
+         self.model.save_weights(self.weight_file, overwrite=True)
 
-   def update_target(self, reward, next_state):
+   def update_target(self, actions, reward, next_state, index):
       self.targets = []
       x, a = self.collect_predict_data(reward, next_state)
       print "Predict"
@@ -82,13 +85,21 @@ class DQN:
       print "Get max Q"
       for i in range(len(reward)):
          if (next_state[i] == FINALSTATE).all():
-            self.targets.append(reward[i])
-            print reward[i]
-            print "================"
+            if reward[i] != 100:
+               r = -100
+            else:
+               r = 100
+            self.targets.append(r)
+            print r
          else:
             a = self.get_maxQ(Q[10*i:10*(i+1)])
-            self.targets.append(reward[i]+self.gamma*a)
-            print reward[i]+self.gamma*a
+            if actions[i][1] == 1:
+               self.targets.append(5+self.gamma*a)
+               print 5+self.gamma*a
+            else:
+               self.targets.append(1+self.gamma*a)
+               print 1+self.gamma*a
+         print "=====" + str(index[i]) + "======="
       self.targets = np.array(self.targets)
 
    def save_model_weight(self):
