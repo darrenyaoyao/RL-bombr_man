@@ -33,18 +33,18 @@ class DQN:
          next_states.append(d['St1'])'''
       num = 1
       for i in range(len(data)):
-		   if len(data[i])-num >= 0:
-				for j in range(len(data[i])-num, len(data[i])):
-					states.append(data[i][j]['St'])
-					rewards.append(data[i][j]['Rt1'])
-					actions.append(data[i][j]['At'])
-					next_states.append(data[i][j]['St1'])
-		   else:
-				for j in range(0, len(data[i])):
-					states.append(data[i][j]['St'])
-					rewards.append(data[i][j]['Rt1'])
-					actions.append(data[i][j]['At'])
-					next_states.append(data[i][j]['St1'])
+         if len(data[i])-num >= 0:
+            for j in range(len(data[i])-num, len(data[i])):
+               states.append(data[i][j]['St'])
+               rewards.append(data[i][j]['Rt1'])
+               actions.append(data[i][j]['At'])
+               next_states.append(data[i][j]['St1'])
+         else:
+            for j in range(0, len(data[i])):
+               states.append(data[i][j]['St'])
+               rewards.append(data[i][j]['Rt1'])
+               actions.append(data[i][j]['At'])
+               next_states.append(data[i][j]['St1'])
       npstates = np.array(states)
       npactions = np.array(actions)
 
@@ -59,11 +59,7 @@ class DQN:
          self.update_evalute_model_weight()
          self.update_target(rewards, next_states)
          print "Shuffle data"
-         indices = np.arange(len(self.targets))
-         np.random.shuffle(indices)
-         npstates = npstates[indices]
-         npacions = npactions[indices]
-         self.targets = self.targets[indices]
+         self.shuffle(self, npstates, npactions)
          print "Start fit"
          print self.targets
          self.model.fit([npstates, npactions], self.targets, batch_size, nb_iter, verbose=1, validation_split=0, callbacks=callbacks)
@@ -72,23 +68,20 @@ class DQN:
          #update_data
          '''num += 1
          for i in range(len(data)):
-             if len(data[i])-num >= 0:
-                 states.insert(0, data[i][len(data[i])-num]['St'])
-                 actions.insert(0, data[i][len(data[i])-num]['At'])
-                 rewards.insert(0, data[i][len(data[i])-num]['Rt1'])
-                 next_states.insert(0, data[i][len(data[i])-num]['St1'])
+            if len(data[i])-num >= 0:
+               states.push(data[i][len(data[i])-num]['St'])
+               actions.push(data[i][len(data[i])-num]['At'])
+               rewards.push(data[i][len(data[i])-num]['Rt1'])
+               next_states.push(data[i][len(data[i])-num]['St1'])
          npstates = np.array(states)
          npactions = np.array(actions)'''
 
    def update_target(self, reward, next_state):
       self.targets = []
-      x = np.zeros((10*len(reward), BOMBR_ROW, BOMBR_COLUMN))
-      a = np.zeros((10*len(reward), 10))
-      for i in range(len(reward)):
-        for j in range(10):
-            x[i*10+j] = next_state[i]
-            a[i*10+j] = self.actions[j]
+      x, a = self.collect_predict_data(reward)
+      print "Predict"
       Q = self.evalute_model.predict([x, a])
+      print "Get max Q"
       for i in range(len(reward)):
          if (next_state[i] == FINALSTATE).all():
             self.targets.append(reward[i])
@@ -115,6 +108,22 @@ class DQN:
       for i in range(10):
          maxQ = max(maxQ, Q[i][0])
       return maxQ
+
+   def shuffle(self, npstates, npactions):
+      indices = np.arange(len(self.targets))
+      np.random.shuffle(indices)
+      npstates = npstates[indices]
+      npacions = npactions[indices]
+      self.targets = self.targets[indices]
+
+   def collect_predict_data(self, reward):
+      x = np.zeros((10*len(reward), BOMBR_ROW, BOMBR_COLUMN))
+      a = np.zeros((10*len(reward), 10))
+      for i in range(len(reward)):
+        for j in range(10):
+            x[i*10+j] = next_state[i]
+            a[i*10+j] = self.actions[j]
+      return x ,a
 
    def predict(self, data):
       return self.evalute_model.predict(data)

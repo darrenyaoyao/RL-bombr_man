@@ -8,6 +8,7 @@ from DQN import DQN
 BOMBR_COLUMN = 19
 BOMBR_ROW = 19
 ACTION_CLASSES = 10
+FEATURE_CLASSES = 6
 
 class bombrtrain:
     def __init__(self, option):
@@ -18,6 +19,7 @@ class bombrtrain:
         self.weights = option.weights
         self.state_data = option.state
         self.action_data = option.action
+        self.feature_data = option.feature
         if self.model == None:
             self.models_init()
         else:
@@ -113,3 +115,45 @@ class bombrtrain:
             a[0] = game[i]['At']
             Q = self.dqnmodel.predict([x, a])
             print Q[0][0]
+    def model_feature_init(self):
+        states_model = Sequential()
+        states_model.add(Reshape((1, BOMBR_ROW, BOMBR_COLUMN), input_shape=(BOMBR_ROW, BOMBR_COLUMN)))
+        states_model.add(Convolution2D(64, 3, 3, activation='relu'))
+        states_model.add(Convolution2D(64, 3, 3, activation='relu'))
+        states_model.add(Dropout(0.25))
+        states_model.add(Flatten())
+        states_model.add(Dense(256, activation='relu'))
+
+        features_model = Sequential()
+        features_model.add(Dense(32, input_shape=(6,), activation='relu'))
+        features_model.add(Dense(64, activation='relu'))
+
+        merged = Merge([states_model, features_model], mode='concat')
+        self.final_model = Sequential()
+        self.final_model.add(merged)
+        self.final_model.add(Dense(512, activation='relu'))
+        self.final_model.add(Dense(512, activation='relu'))
+        self.final_model.add(Dense(ACTION_CLASSES, activation='softmax'))
+        open('model_feature.json', 'w').write(self.final_model.to_json())
+
+    def model_feature_train(self):
+        if self.weights != None:
+            self.final_model.load_weights(self.weights)
+        else:
+            self.weights = 'model_feature_weight.h5'
+        self.final_model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+        self.final_model.summary()
+        self.states = np.load(self.state_data)
+        self.actions = np.load(self.action_data)
+        self.features = np.load(self.feature_data)
+        indices = np.arange(len(self.states))
+        np.random.shuffle(indices)
+        self.states = self.states[indices]
+        self.actions = self.actions[indices]
+        self.features = self.features[indices]
+        callbacks = [
+            EarlyStopping(monitor='val_loss', patience=10, verbose=0),
+            ModelCheckpoint(filepath=self.weights, monitor='val_loss', save_best_only=True, verbose=0)
+        ]
+        self.final_model.fit([self.states, self.features], self.actions, batch_size=128, nb_epoch=50, verbose=1, validation_split=0.1, callbacks=callbacks)
+

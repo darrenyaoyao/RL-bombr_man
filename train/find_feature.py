@@ -2,28 +2,29 @@ import numpy as np
 import sys
 
 def find_distance(player_pos, obj_pos):
-    d = 19*(2**0.5)
-    if len(obj_pos) != 0:
-        d = ((obj_pos[0]-player_pos[0])**2 + (obj_pos[1]-player_pos[1])**2)**0.5
-    return d
+    d = ((obj_pos[0]-player_pos[0])**2 + (obj_pos[1]-player_pos[1])**2)**0.5
+    return int(d)
 
 def find_nearest(player_pos, objects_pos):
-    min_distance = 19 * (2**0.5)
+    min_distance = 15*(2**0.5)
     for i in range(len(objects_pos)):
         d = ((objects_pos[i][0]-player_pos[0])**2 + (objects_pos[i][1]-player_pos[1])**2)**0.5
         if d < min_distance:
             min_distance = d
-    return min_distance
+    return int(min_distance)
 
 def check_direction(player_pos, state):
     if state[player_pos[0]-1][player_pos[1]] == 4:
         return 0 #if can move up, return 0
-    if state[player_pos[0]+1][player_pos[1]] == 4:
+    elif state[player_pos[0]+1][player_pos[1]] == 4:
         return 1 #if can move down, return 1
-    if state[player_pos[0]][player_pos[1]-1] == 4:
+    elif state[player_pos[0]][player_pos[1]-1] == 4:
         return 2 #if can move left, return 2
-    if state[player_pos[0]][player_pos[1]+1] == 4:
+    elif state[player_pos[0]][player_pos[1]+1] == 4:
         return 3 #if can move right, return 3
+    else:
+        return 4
+
 
 def find_player(player_pos, states, k):
     count = 1

@@ -80,8 +80,8 @@ class Player(object):
                 serge.sound.Sounds.play('drop')
 
     def initialmodel(self):
-        self.model = model_from_json(open("./train/model.json").read())
-        self.model.load_weights("./train/model_weight.h5")
+        self.model = model_from_json(open("./train/model_feature.json").read())
+        self.model.load_weights("./train/model_feature_weight.h5")
         self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
     def supervised_policy(self, agent_dic):
@@ -136,3 +136,56 @@ class Player(object):
         else:
             agent_dic["action"] = 0
             return None
+
+    def parse_feature(self, s):
+        if s == np.zero((BOMBR_ROW, BOMBR_COLUMN)).all():
+            d = int(15*(2**0.5))
+            features = [d, d, d, d, d, 4]
+            return features
+        player_pos = []
+        ai_pos = []
+        flag_pos = []
+        for i in range(len(s)):
+            for j in range(len(s[i])):
+                if s[i][j] == 6:
+                    player_pos.append(i)
+                    player_pos.append(j)
+                elif s[i][j] == 7:
+                    ai_pos.append(i)
+                    ai_pos.append(j)
+                elif s[i][j] == 0:
+                    tmp = []
+                    tmp.append(i)
+                    tmp.append(j)
+                    flag_pos.append(tmp)
+        if len(player_pos) == 0:
+            find_player(player_pos, states, k)
+        if len(ai_pos) == 0:
+            find_ai(ai_pos, states, k)
+        box_pos = []
+        bomb_pos = []
+        explosion_pos = []
+        for i in range(player_pos[0]-2, player_pos[0]+2):
+            for j in range(player_pos[1]-2, player_pos[1]+2):
+                if s[i][j] == 2:
+                    tmp = []
+                    tmp.append(i)
+                    tmp.append(j)
+                    box_pos.append(tmp)
+                elif s[i][j] == 8:
+                    tmp = []
+                    tmp.append(i)
+                    tmp.append(j)
+                    bomb_pos.append(tmp)
+                elif s[i][j] == 9:
+                    tmp = []
+                    tmp.append(i)
+                    tmp.append(j)
+                    explosion_pos.append(tmp)
+        features_tmp = []
+        features_tmp.append(find_distance(player_pos, ai_pos))
+        features_tmp.append(find_nearest(player_pos, flag_pos)) #if no flag, distance = 19*(2**0.5)
+        features_tmp.append(find_nearest(player_pos, box_pos)) #if no box in 5*5, distance = 19*(2**0.5)
+        features_tmp.append(find_nearest(player_pos, bomb_pos)) #if no bomb in 5*5, distance = 19*(2**0.5)
+        features_tmp.append(find_nearest(player_pos, explosion_pos)) #if no explosion in 5*5, distance = 19*(2**0.5)
+        features_tmp.append(check_direction(player_pos, s))
