@@ -28,10 +28,10 @@ class parseData:
         for i in range(len(self.sequence)):
             flag = self.sequence[i][-1]['Rt1']
             for j in range(len(self.sequence[i])):
-                if j > 100:
-                    ACTION_PERCENT_RETAIN = 0.1
+                if j > 140:
+                    ACTION_PERCENT_RETAIN = 0.15
                 else:
-                    ACTION_PERCENT_RETAIN = 0.25
+                    ACTION_PERCENT_RETAIN = 0.30
                 if ((self.sequence[i][-j-1]['At']==action0).all()) and (random.random() > ACTION_PERCENT_RETAIN):
                     pass
                 else:
@@ -55,9 +55,9 @@ class parseData:
         for i in range(len(self.sequence)):
             for j in range(len(self.sequence[i])):
                 if j < 70:
-                    ACTION_PERCENT_RETAIN = 0.1
+                    ACTION_PERCENT_RETAIN = 0.15
                 else:
-                    ACTION_PERCENT_RETAIN = 0.25
+                    ACTION_PERCENT_RETAIN = 0.30
                 if ((self.sequence[i][j]['At']==action0).all()) and (random.random() > ACTION_PERCENT_RETAIN):
                     pass
                 else:
