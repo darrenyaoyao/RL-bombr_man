@@ -54,6 +54,7 @@ class MainScreen(serge.blocks.actors.ScreenActor):
         self.death_music = serge.sound.Music.getItem('death-music')
         self.success_music = serge.sound.Music.getItem('success-music')
         self.observation = observation
+        self.start_time = time.time()
         #
         self.generator = serge.blocks.textgenerator.TextGenerator()
         self.generator.addExamplesFromFile(os.path.join('game', 'smack-talk.txt'))
@@ -283,7 +284,7 @@ class MainScreen(serge.blocks.actors.ScreenActor):
         """The player has died"""
         # write out reward
         with open(self.options.reward, 'a') as f:
-            f.write("-1\n")
+            f.write(str(time.time()-self.start_time)+"\n")
         if not self.player.is_dead:
             serge.sound.Sounds.play('death')
             self.board.addGore(self.player)
@@ -303,7 +304,7 @@ class MainScreen(serge.blocks.actors.ScreenActor):
         """The AI has died"""
         # write out reward
         with open(self.options.reward, 'a') as f:
-            f.write("1\n")
+            f.write("10000\n")
         if not self.ai.is_dead:
             serge.sound.Sounds.play('death')
             self.board.addGore(self.ai)
@@ -445,7 +446,7 @@ class MainScreen(serge.blocks.actors.ScreenActor):
         self.player = serge.blocks.utils.addActorToWorld(
             self.world,
             man.Man('man', 'player', 'tiles-6', self.board,
-                    ai.AI() if G('all-ai') else play_ai.PlayerAI()),
+                    ai.AI() if G('all-ai') else player.Player()),
             layer_name='men'
         )
 

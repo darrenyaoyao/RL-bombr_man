@@ -29,7 +29,7 @@ class DQN:
          rewards.append(d['Rt1'])
          actions.append(d['At'])
          next_states.append(d['St1'])'''
-      num = 54
+      num = 1
       for i in range(len(data)):
          if len(data[i])-num >= 0:
             for j in range(len(data[i])-num, len(data[i])):

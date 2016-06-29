@@ -2,6 +2,7 @@ from keras.models import Sequential
 from keras.layers.core import Dense, Dropout, Flatten, Reshape, Merge
 from keras.layers.convolutional import Convolution2D
 from keras.callbacks import EarlyStopping, ModelCheckpoint
+from keras.models import model_from_json
 import numpy as np
 from DQN import DQN
 BOMBR_COLUMN = 19
