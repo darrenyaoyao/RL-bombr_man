@@ -101,7 +101,7 @@ class bombrtrain:
             self.dqn_data.append(self.seq[i][j])
 
     def dqn_train(self):
-      self.dqnmodel.train(self.seq, self.all_action, 0.99)
+      self.dqnmodel.train(self.seq, self.all_action, 0.9999)
 
     def dqn_train_test(self):
       for game in self.seq:

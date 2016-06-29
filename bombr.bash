@@ -1,4 +1,4 @@
-for i in {1..50}
+for i in {1..48}
 do
-  python2 bombr.py -Q -O dqn_1.obser -W dqn_1.reward
+  python2 bombr.py -Q -O dqn_2.obser -W dqn_2.reward
 done

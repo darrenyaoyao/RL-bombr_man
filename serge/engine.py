@@ -21,13 +21,13 @@ pygame.init()
 
 class Engine(common.Loggable, serialize.Serializable, common.EventAware):
     """The main Serge engine
-    
+
     The engine manages a set of worlds and allows
     a single :doc:`world`, the current world, to be automatically
     updated on a certain time frequency.
-    
+
     """
-    
+
     my_properties = (
         serialize.L('_worlds', [], 'the worlds in this engine'),
         serialize.O('renderer', None, 'the renderer for this engine'),
@@ -36,13 +36,13 @@ class Engine(common.Loggable, serialize.Serializable, common.EventAware):
         serialize.L('_recent_worlds', [], 'the list of worlds recently visited'),
         serialize.B('fullscreen', False, 'whether to display in full screen or not'),
     )
-    
+
     def __init__(self, width=640, height=480, title='Serge', backcolour=(0,0,0), icon=None, fullscreen=False):
         """Initialise the engine
-        
+
         :param width: width of the screen
         :param height: height of the screen
-        
+
         """
         self.title = title
         self.fullscreen = fullscreen
@@ -62,7 +62,7 @@ class Engine(common.Loggable, serialize.Serializable, common.EventAware):
         self._stats = EngineStats()
         self._recent_worlds = []
         self._profiler = profiler.NullProfiler()
-                    
+
     def init(self):
         """Initialise ourself"""
         self.addLogger()
@@ -86,12 +86,12 @@ class Engine(common.Loggable, serialize.Serializable, common.EventAware):
         self._builder = None
         self._keyboard = input.Keyboard()
         self._mouse = input.Mouse(self)
-            
+
     def addWorld(self, world):
         """Add a world to the engine
-        
+
         :param world: the world instance to add
-        
+
         """
         if world.name in self._worlds:
             raise DuplicateWorld('A world named "%s" already exists' % world.name)
@@ -99,18 +99,18 @@ class Engine(common.Loggable, serialize.Serializable, common.EventAware):
             raise DuplicateWorld('This world (named "%s") already exists' % world.name)
         self._worlds[world.name] = world
         world.setEngine(self)
-        
+
     def removeWorld(self, world):
         """Remove a world from the engine
-        
+
         :param world: the world instance to remove
 
         """
         self.removeWorldNamed(world.name)
-        
+
     def removeWorldNamed(self, name):
         """Remove a world with a given name
-        
+
         :param name: the name of the world to remove
 
         """
@@ -123,10 +123,10 @@ class Engine(common.Loggable, serialize.Serializable, common.EventAware):
         """Clear all the worlds"""
         self._worlds = {}
         self._current_world = None
-        
+
     def getWorld(self, name):
         """Return the named world
-        
+
         :param name: the name of the world to return
 
         """
@@ -145,18 +145,18 @@ class Engine(common.Loggable, serialize.Serializable, common.EventAware):
             return self._current_world
         else:
             raise NoCurrentWorld('There is no current world')
-        
+
     def setCurrentWorld(self, world):
         """Set the current world
-        
+
         :param world: the world to set as the current world
 
         """
         self.setCurrentWorldByName(world.name)
-        
+
     def setCurrentWorldByName(self, name):
         """Set the current world to the one with the given name
-        
+
         :param name: the name of the world to set as the current world
 
         """
@@ -178,10 +178,10 @@ class Engine(common.Loggable, serialize.Serializable, common.EventAware):
 
     def goBackToPreviousWorld(self, obj=None, arg=None):
         """Return to the world we were in before this one
-        
+
         The arguments are never used and are just here to allow you to use
         this method as an event callback.
-        
+
         """
         try:
             name = self._recent_worlds.pop()
@@ -191,20 +191,20 @@ class Engine(common.Loggable, serialize.Serializable, common.EventAware):
         # We will have pushed the current world onto the stack, which we don't want
         # so take it off again
         self._recent_worlds.pop()
-        
+
     def updateWorld(self, interval):
         """Update the current world"""
         if self._current_world:
             self._current_world.updateWorld(interval)
         else:
             raise NoCurrentWorld('Cannot update when there is no current world')
-        
+
     def run(self, fps, endat=None):
         """Run the updates at the specified frames per second until the optional endtime
-        
+
         :param fps: the target frames per second (integer)
         :param endat: a time to stop the engine at (long), eg time.time()+60 to run for a minute
-        
+
         """
         self.log.info('Engine starting (requested fps=%d)' % fps)
         clock = pygame.time.Clock()
@@ -242,7 +242,7 @@ class Engine(common.Loggable, serialize.Serializable, common.EventAware):
                 pygame.event.clear()
                 # Sound
                 sound.Music.update(interval)
-                sound.Sounds.update(interval)                
+                sound.Sounds.update(interval)
                 if self._current_world:
                     self.processEvents()
                 #
@@ -273,13 +273,13 @@ class Engine(common.Loggable, serialize.Serializable, common.EventAware):
         self.log.info('Engine stopping')
         self.processEvent((events.E_AFTER_STOP, self))
         self.log.info('Engine info: %s' % (self._stats,))
-        
+
     def runAsync(self, fps, endat=None):
         """Run the engine asynchronously
-        
+
         :param fps: the target frames per second (integer)
         :param endat: a time to stop the engine at (long), eg time.time()+60 to run for a minute
-        
+
         """
         self.runner = threading.Thread(target=self.run, args=(fps, endat))
         self.runner.setDaemon(True)
@@ -294,49 +294,49 @@ class Engine(common.Loggable, serialize.Serializable, common.EventAware):
     def getRenderer(self):
         """Return the renderer"""
         return self.renderer
-    
+
     def getSprites(self):
         """Return the sprite registry"""
         return self.sprites
-        
+
     def save(self, filename):
         """Store the engine state in a file suitable for loading again in the furture
-        
+
         :param filename: the name of the file to save into
-        
+
         """
         with file(filename, 'w') as f:
             f.write(self.asString())
-            
+
     def attachBuilder(self, builder):
         """Attach a builder"""
         self._builder = builder
-        
+
     def detachBuilder(self):
         """Detach the builder"""
         self._builder = None
-        
+
     def getKeyboard(self):
         """Return the keyboard"""
         return self._keyboard
-    
+
     def getMouse(self):
         """Return the mouse"""
         return self._mouse
-    
+
     def getStats(self):
         """Return the stats for the engine"""
         return self._stats
-    
-       
+
+
     ### Events ###
-    
+
     def _handleEvents(self):
         """Handle all events"""
         events = pygame.event.get(pygame.QUIT)
         if events:
             self.stop()
-    
+
     def processEvents(self):
         """Process all the events for the current world"""
         events = self._mouse.getActorEvents(self._current_world, layer_order=self.renderer.getRenderingOrderDictionary())
@@ -344,19 +344,19 @@ class Engine(common.Loggable, serialize.Serializable, common.EventAware):
         self._current_world.processEvents(to_do)
 
     ### Profiling ###
-    
+
     def profilingOn(self):
         """Turn the profiling on"""
         self._profiler = profiler.PROFILER
-        
+
     def getProfiler(self):
         """Return the current profiler"""
         return self._profiler
-        
+
 
 class EngineStats(object):
     """Statistic for the engine"""
-    
+
     def __init__(self):
         """Initialise the stats"""
         self.start_time = time.time()
@@ -365,7 +365,7 @@ class EngineStats(object):
         self.last_frame = None
         self.last_render = None
         self.average_render_time = 0.0
-        
+
     def recordFrame(self):
         """Record a frame"""
         now = time.time()
@@ -376,13 +376,13 @@ class EngineStats(object):
                 # Sometimes happens on Windows
                 return
             self.average_frame_rate = (59*self.average_frame_rate + self.current_frame_rate)/60.0
-            
+
         self.last_frame = time.time()
 
     def beforeRender(self):
         """Record we are before a rendering cycle"""
         self.last_render = time.time()
-        
+
     def afterRender(self):
         """Record that we are after a rendering cycle"""
         self.average_render_time = (59*self.average_render_time + (time.time() - self.last_render))/60.0
@@ -391,8 +391,8 @@ class EngineStats(object):
         """Nice representation"""
         return '(current fps=%f, ave fps=%f, ave render=%fs)' % (
             self.current_frame_rate, self.average_frame_rate, self.average_render_time)
-        
-        
+
+
 ### Allow people to find the current engine ###
 
 _current_engine = None
