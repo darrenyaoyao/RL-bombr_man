@@ -446,7 +446,7 @@ class MainScreen(serge.blocks.actors.ScreenActor):
         self.player = serge.blocks.utils.addActorToWorld(
             self.world,
             man.Man('man', 'player', 'tiles-6', self.board,
-                    ai.AI() if G('all-ai') else player.Player()),
+                    ai.AI() if G('all-ai') else play_ai.PlayerAI()),
             layer_name='men'
         )
 
