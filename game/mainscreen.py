@@ -304,7 +304,7 @@ class MainScreen(serge.blocks.actors.ScreenActor):
         """The AI has died"""
         # write out reward
         with open(self.options.reward, 'a') as f:
-            f.write("10000\n")
+            f.write("100\n")
         if not self.ai.is_dead:
             serge.sound.Sounds.play('death')
             self.board.addGore(self.ai)

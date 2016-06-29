@@ -7,16 +7,18 @@ BOMBR_COLUMN = 19
 BOMBR_ROW = 19
 
 class DQN:
-   def __init__(self, model, load_weight=False, weight_file="../dqnmodel_weight.h5"):
+   def __init__(self, model, load_weight=False, weight_file="./model/dqn_new_reward.h5"):
       self.model = model
       json_string = model.to_json()
+      self.weight_file = weight_file
+      print self.weight_file
       self.evalute_model = model_from_json(json_string)
       if load_weight:
          self.model.load_weights(weight_file)
          self.evalute_model.load_weights(weight_file)
 
-   def train(self, data, actions, gamma=0.999, batch_size=128, nb_epoch=200,
-         nb_iter=1, optimizer='adam'):
+   def train(self, data, actions, gamma=0.999, batch_size=32, nb_epoch=200,
+         nb_iter=20, optimizer='adam'):
       self.actions = actions
       self.optimizer = optimizer
       self.gamma = gamma
@@ -48,45 +50,45 @@ class DQN:
 
       self.model.compile(loss='mean_squared_error', optimizer=optimizer)
       self.model.summary()
-      callbacks = [
-         ModelCheckpoint(filepath="dqnmodel_weight.h5", monitor='val_loss', save_best_only=True, verbose=0)
-      ]
       self.save_model_weight()
       for x in range(nb_epoch):
          print "All Date Epoch "+str(x)+"/"+str(nb_epoch)
          self.update_evalute_model_weight()
          self.update_target(rewards, next_states)
          print "Shuffle data"
-         self.shuffle(self, npstates, npactions)
+         #self.shuffle(npstates, npactions)
          print "Start fit"
          print self.targets
-         self.model.fit([npstates, npactions], self.targets, batch_size, nb_iter, verbose=1, validation_split=0.05, callbacks=callbacks)
+         self.model.fit([npstates, npactions], self.targets, batch_size, nb_iter, verbose=1, validation_split=0, shuffle=True)
          print "Finish fit"
          self.save_model_weight()
          #update_data
          num += 1
          for i in range(len(data)):
             if len(data[i])-num >= 0:
-               states.push(data[i][len(data[i])-num]['St'])
-               actions.push(data[i][len(data[i])-num]['At'])
-               rewards.push(data[i][len(data[i])-num]['Rt1'])
-               next_states.push(data[i][len(data[i])-num]['St1'])
+               states.append(data[i][len(data[i])-num]['St'])
+               actions.append(data[i][len(data[i])-num]['At'])
+               rewards.append(data[i][len(data[i])-num]['Rt1'])
+               next_states.append(data[i][len(data[i])-num]['St1'])
          npstates = np.array(states)
          npactions = np.array(actions)
-         self.model.save_weights('dqn.h5', overwrite=True)
+         self.model.save_weights(self.weight_file)
 
    def update_target(self, reward, next_state):
       self.targets = []
-      x, a = self.collect_predict_data(reward)
+      x, a = self.collect_predict_data(reward, next_state)
       print "Predict"
       Q = self.evalute_model.predict([x, a])
       print "Get max Q"
       for i in range(len(reward)):
          if (next_state[i] == FINALSTATE).all():
             self.targets.append(reward[i])
+            print reward[i]
+            print "================"
          else:
             a = self.get_maxQ(Q[10*i:10*(i+1)])
             self.targets.append(reward[i]+self.gamma*a)
+            print reward[i]+self.gamma*a
       self.targets = np.array(self.targets)
 
    def save_model_weight(self):
@@ -114,7 +116,7 @@ class DQN:
       npacions = npactions[indices]
       self.targets = self.targets[indices]
 
-   def collect_predict_data(self, reward):
+   def collect_predict_data(self, reward, next_state):
       x = np.zeros((10*len(reward), BOMBR_ROW, BOMBR_COLUMN))
       a = np.zeros((10*len(reward), 10))
       for i in range(len(reward)):
