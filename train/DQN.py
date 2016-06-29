@@ -31,18 +31,18 @@ class DQN:
          next_states.append(d['St1'])'''
       num = 54
       for i in range(len(data)):
-		   if len(data[i])-num >= 0:
-            for j in range(len(data[i])-num, len(data[i])):
-					states.append(data[i][j]['St'])
-               rewards.append(data[i][j]['Rt1'])
-               actions.append(data[i][j]['At'])
-               next_states.append(data[i][j]['St1'])
-		   else:
-            for j in range(0, len(data[i])):
-               states.append(data[i][j]['St'])
-               rewards.append(data[i][j]['Rt1'])
-               actions.append(data[i][j]['At'])
-               next_states.append(data[i][j]['St1'])
+            if len(data[i])-num >= 0:
+                for j in range(len(data[i])-num, len(data[i])):
+                    states.append(data[i][j]['St'])
+                    rewards.append(data[i][j]['Rt1'])
+                    actions.append(data[i][j]['At'])
+                    next_states.append(data[i][j]['St1'])
+	    else:
+                for j in range(0, len(data[i])):
+                    states.append(data[i][j]['St'])
+                    rewards.append(data[i][j]['Rt1'])
+                    actions.append(data[i][j]['At'])
+                    next_states.append(data[i][j]['St1'])
 
       npstates = np.array(states)
       npactions = np.array(actions)
