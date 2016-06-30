@@ -1,9 +1,14 @@
+<<<<<<< HEAD
 from keras.models import Sequential, model_from_json
 from keras.layers.core import Dense, Dropout, Flatten, Reshape, Merge
+=======
+from keras.models import Sequential
+>>>>>>> 7697c73b937b1d61fde235ba062ab8df92f6ecf9
 from keras.layers.convolutional import Convolution2D
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras import backend as K
 from keras.models import model_from_json
+from keras.layers.core import Dense, Dropout, Flatten, Reshape, Merge
 import numpy as np
 from DQN import DQN
 BOMBR_COLUMN = 19
@@ -41,6 +46,7 @@ class bombrtrain:
 
     def models_policy_train(self):
         if self.state_data != None and self.action_data != None :
+            print "start training policy supervised"
             if self.weights != None:
                 self.model.load_weights(self.weights)
             else:
@@ -64,37 +70,43 @@ class bombrtrain:
 
     def models_inforcement_train(self):
         if self.classified_data != None:
+            print "start training policy inforcement"
             if self.weights != None:
                 self.model.load_weights(self.weights)
             else:
-                self.weights = 'npyNmodel/model_weight_classified_0630_0302.h5'
+                self.weights = 'npyNmodel/weight_classified_dpn.h5'
             #fitting for '+1'
             self.classified = np.load(self.classified_data)
-            self.states_1 = np.asarray(self.classified[1][0])
-            self.actions_1 = np.asarray(self.classified[1][1])
-            self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-            self.model.summary()
-            self.states_0 = np.asarray(self.classified[0][0])
-            self.actions_0 = np.asarray(self.classified[0][1])
-            indices = np.arange(len(self.states_0))
-            np.random.shuffle(indices)
-            self.states_0 = self.states_0[indices]
-            self.actions_0 = self.actions_0[indices]
+            states_0 = np.asarray(self.classified[0][0])
+            actions_0 = np.asarray(self.classified[0][1])
+            states_3 = np.asarray(self.classified[1][0])
+            actions_3 = np.asarray(self.classified[1][1])
+            self.states_1 = np.concatenate((states_0 , states_3),axis=0)
+            print len(self.states_1)
+            self.actions_1 = np.concatenate ((actions_0 , actions_3),axis = 0)
+            print len(self.actions_1)
             callbacks = [
                 EarlyStopping(monitor='val_loss', patience=8, verbose=0),
                 ModelCheckpoint(filepath=self.weights, monitor='val_loss', save_best_only=True, verbose=0)
             ]
-            self.model.fit(self.states_0, self.actions_0, batch_size=128, nb_epoch=30, verbose=1, validation_split=0.1, callbacks=callbacks)
+            indices = np.arange(len(self.states_1))
+            np.random.shuffle(indices)
+            self.states_1 = self.states_1[indices]
+            self.actions_1 = self.actions_1[indices]
             '''
-            #fitting for '-1'
-            self.model.compile(loss=self.inverse_categorical_crossentropy, optimizer='adam', metrics=['accuracy'])
-            self.model.summary()
             ind = np.arange(len(self.states_1))
             np.random.shuffle(ind)
             self.states_1 = self.states_1[ind]
             self.actions_1 = self.actions_1[ind]
-            self.model.fit(self.states_1, self.actions_1, batch_size=32, nb_epoch=25, verbose=1, validation_split=0.1, callbacks=callbacks)
+            
+            self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+            self.model.summary()
+            self.model.fit(self.states_0, self.actions_0, batch_size=128, nb_epoch=2, verbose=1, validation_split=0.1, callbacks=callbacks)
             '''
+            self.model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
+            self.model.summary()
+            self.model.fit(self.states_1, self.actions_1, batch_size=128, nb_epoch=50, verbose=1, validation_split=0.1, callbacks=callbacks)
+            
 
     def test_predict(self):
         self.model.load_weights(self.weights)

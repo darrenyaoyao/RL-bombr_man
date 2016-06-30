@@ -36,9 +36,9 @@ class parseData:
                     pass
                 else:
                     if flag == int(-1):
-                        if j < 70:
+                        if j < 20:
                             self.classified[1][0].append(self.sequence[i][-j-1]['St'])
-                            self.classified[1][1].append(self.sequence[i][-j-1]['At'])
+                            self.classified[1][1].append(self.inverse_action(self.sequence[i][-j-1]['At']))
                         else:
                             self.classified[0][0].append(self.sequence[i][-j-1]['St'])
                             self.classified[0][1].append(self.sequence[i][-j-1]['At'])
@@ -46,7 +46,16 @@ class parseData:
                         self.classified[0][0].append(self.sequence[i][-j-1]['St'])
                         self.classified[0][1].append(self.sequence[i][-j-1]['At'])
 
-
+    def inverse_action(self, action):
+        index = np.where(action == 1)[0]
+        new_action = np.zeros(10)
+        inds = [0,1,2,4,6,8]
+        for i in inds:
+            new_action[i]=0.2
+        if len(index) != 0 :
+            new_action[index[0]] = 0
+        return new_action
+    
     def policy_train_data(self):
         self.states = []
         self.actions = []
