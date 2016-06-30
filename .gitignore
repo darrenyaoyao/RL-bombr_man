@@ -5,3 +5,7 @@
 */*/*.pyc
 *.npy
 */*.npy
+*.xml
+*/*.xml
+*.png
+*/*.png

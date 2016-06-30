@@ -64,9 +64,9 @@ class parseData:
         for i in range(len(self.sequence)):
             for j in range(len(self.sequence[i])):
                 if j < 70:
-                    ACTION_PERCENT_RETAIN = 0.15
+                    ACTION_PERCENT_RETAIN = 0.18
                 else:
-                    ACTION_PERCENT_RETAIN = 0.30
+                    ACTION_PERCENT_RETAIN = 0.35
                 if ((self.sequence[i][j]['At']==action0).all()) and (random.random() > ACTION_PERCENT_RETAIN):
                     pass
                 else:
