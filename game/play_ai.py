@@ -166,8 +166,9 @@ class PlayerAI(object):
         obser_arr[0] = obser
         f = find_feature()
         feature = f.parse_feature(observation, obser)
-        print type(feature)
-        features = np.array((1, 6))
-        features[0] = np.array(feature)
-        action = self.model.predict_classes([obser_arr, features])
+        feature_arr = np.zeros((1, 6))
+        feature_arr[0] = np.asarray(feature)
+        print feature_arr
+        print obser_arr
+        action = self.model.predict_classes([obser_arr, feature_arr])
         return self.action2direction(action, agent_dic)

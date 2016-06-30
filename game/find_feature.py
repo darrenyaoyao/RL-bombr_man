@@ -101,10 +101,17 @@ class find_feature():
                     tmp.append(i)
                     tmp.append(j)
                     explosion_pos.append(tmp)
+        print features
         features.append(self.find_distance(player_pos, ai_pos))
+        print features
         features.append(self.find_nearest(player_pos, flag_pos)) #if no flag, distance = 19*(2**0.5)
+        print features
         features.append(self.find_nearest(player_pos, box_pos)) #if no box in 5*5, distance = 19*(2**0.5)
+        print features
         features.append(self.find_nearest(player_pos, bomb_pos)) #if no bomb in 5*5, distance = 19*(2**0.5)
+        print features
         features.append(self.find_nearest(player_pos, explosion_pos)) #if no explosion in 5*5, distance = 19*(2**0.5)
+        print features
         features.append(self.check_direction(player_pos, s))
+        print features
         return features
