@@ -52,8 +52,8 @@ parser.add_option("-R", "--random", dest="random", default=False, action="store_
                   help="random policy")
 parser.add_option("-P", "--supervised_policy", dest="supervised_policy", default=False, action="store_true",
                   help="supervised_policy")
-parser.add_option("-Q", "--dqn_policy", dest="dqn", default=False, action="store_true",
-                  help="dqn")
+parser.add_option("-Q", "--Qmodel", dest="Qmodel", default=False, action="store_true",
+                  help="Qmodel")
 parser.add_option("-F", "--feature_supervised_policy", dest="feature_supervised_policy", default=False,
                   action="store_true", help="supervised_policy")
 
