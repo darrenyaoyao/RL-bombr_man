@@ -4,6 +4,7 @@ BOMBR_COLUMN = 19
 BOMBR_ROW = 19
 FINALSTATE = np.full((19,19),3.0)
 #FINALSTATE = np.full(361,3.0)
+FINALACTION = np.full(10,1.0)
 REWARD = 0
 ACTION_PERCENT_RETAIN = 0.2
 
@@ -73,8 +74,12 @@ class parseData:
                     if counter != 0:
                         data[counter-1]['At'] = action
                         data[counter-1]['St1'] = state
+                    if counter > 1 :
+                        data[counter-2]['At1'] = action
                 else:
                     data[counter-1]['At'] = action
+                    data[counter-2]['At1'] = action
+                    data[counter-1]['At1'] = FINALACTION
                     data[counter-1]['St1'] = FINALSTATE
                     rew = float(r.replace("\n",""))
                     data[counter-1]['Rt1'] = rew

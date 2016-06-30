@@ -81,8 +81,8 @@ class PlayerAI(object):
         self.model = model_from_json(open("./train/model.json").read())
         self.model.load_weights("./train/model_weight.h5")
         self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-        self.dqnmodel = model_from_json(open("dqnmodel.json").read())
-        self.dqnmodel.load_weights("./model/dqn_new_reward.h5")
+        self.dqnmodel = model_from_json(open("/home/ron/dqnmodel.json").read())
+        self.dqnmodel.load_weights("/home/ron/dqnmodel_weight.h5")
         self.dqnmodel.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
 
     def supervised_policy(self, agent_dic):
@@ -107,7 +107,7 @@ class PlayerAI(object):
         maxQ = Q[0][0]
         action = 0
         for i in range(10):
-            if Q[i][0] > maxQ :
+            if Q[i][0] > maxQ:
                 maxQ = Q[i][0]
                 action = i
         #epilon-greedy

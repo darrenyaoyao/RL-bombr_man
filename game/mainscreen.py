@@ -235,7 +235,12 @@ class MainScreen(serge.blocks.actors.ScreenActor):
     def updateActor(self, interval, world):
         """Update this actor"""
         super(MainScreen, self).updateActor(interval, world)
-
+        if self.flag_status_panel.currently_carrying == "None":
+            self.board.observation[-1]["flag"] = 0
+        elif self.flag_status_panel.currently_carrying == "player":
+            self.board.observation[-1]["flag"] = 1
+        elif self.flag_status_panel.currently_carrying == "ai":
+            self.board.observation[-1]["flag"] = 2
         #
         # Watch for restarting game
         if self._game_over:

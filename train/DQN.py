@@ -18,8 +18,8 @@ class DQN:
          self.model.load_weights(weight_file)
          self.evalute_model.load_weights(weight_file)
 
-   def train(self, data, actions, gamma=0.999, batch_size=4, nb_epoch=300,
-         nb_iter=300, optimizer='adam'):
+   def train(self, data, actions, gamma=0.999, batch_size=16, nb_epoch=300,
+         nb_iter=50, optimizer='adam'):
       self.actions = actions
       self.optimizer = optimizer
       self.gamma = gamma
@@ -51,10 +51,6 @@ class DQN:
                index.append(i)
       npstates = np.array(states)
       npactions = np.array(actions)
-
-      callbacks = [
-         EarlyStopping(monitor='loss', patience=10, verbose=0)
-      ]
       self.model.compile(loss='mean_squared_error', optimizer=optimizer)
       self.model.summary()
       self.save_model_weight()
@@ -66,7 +62,7 @@ class DQN:
          #self.shuffle(npstates, npactions)
          print "Start fit"
          print self.targets
-         self.model.fit([npstates, npactions], self.targets, batch_size, nb_iter, verbose=1, validation_split=0, shuffle=True, callbacks=callbacks)
+         self.model.fit([npstates, npactions], self.targets, batch_size, nb_iter, verbose=1, validation_split=0, shuffle=True)
          print "Finish fit"
          self.save_model_weight()
          #update_data
@@ -83,11 +79,14 @@ class DQN:
          self.model.save_weights(self.weight_file, overwrite=True)
 
    def update_target(self, actions, reward, next_state, index):
-      self.targets = []
-      x, a = self.collect_predict_data(reward, next_state)
+      #self.targets = []
+      #TD
+      x, a = np.array(next_state), np.array(actions)
+      #DQN
+      #x, a = self.collect_predict_data(reward, next_state)
       print "Predict"
       Q = self.evalute_model.predict([x, a])
-      print "Get max Q"
+      '''print "Get max Q"
       for i in range(len(reward)):
          if (next_state[i] == FINALSTATE).all():
             if reward[i] != 100:
@@ -99,12 +98,13 @@ class DQN:
          else:
             a = self.get_maxQ(Q[10*i:10*(i+1)])
             if actions[i][1] == 1:
+               print actions[i]
                self.targets.append(5+self.gamma*a)
-               print 1.5+self.gamma*a
+               print -1+self.gamma*a
             else:
                self.targets.append(1+self.gamma*a)
-               print 1+self.gamma*a
-         print "=====" + str(index[i]) + "======="
+               print 10+self.gamma*a
+         print "=====" + str(index[i]) + "======="'''
       self.targets = np.array(self.targets)
 
    def save_model_weight(self):

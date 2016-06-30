@@ -14,4 +14,8 @@ parser.add_argument('-Q', action='store', dest='seq')
 Bombr_data = parseData(parser.parse_args())
 Bombr_data.policy_train_data()
 Bombr_data.getDataDistribution()
+for i in range(len(Bombr_data.sequence[0])):
+    print "data[ "+str(i)+" ] : "
+    print "At: "+str(Bombr_data.sequence[0][i]['At'])
+    print "At1: "+str(Bombr_data.sequence[0][i]['At1'])
 Bombr_data.save_npy()
