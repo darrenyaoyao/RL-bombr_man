@@ -89,14 +89,10 @@ class bombrtrain:
       self.dqnmodel = DQN(final_model, load_weights, weights_file)
 
     def dqn_train(self):
-<<<<<<< HEAD
-      self.dqnmodel.train(self.seq, self.all_action, 0.9999)
-=======
       self.dqnmodel.train(self.seq, self.all_action, 0.96)
 
     def sarsa_train(self):
       self.dqnmodel.sarsa_train(self.seq, 0.96)
->>>>>>> master
 
     def dqn_train_test(self):
       for game in self.seq:
