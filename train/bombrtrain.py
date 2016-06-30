@@ -1,9 +1,4 @@
-<<<<<<< HEAD
-from keras.models import Sequential, model_from_json
-from keras.layers.core import Dense, Dropout, Flatten, Reshape, Merge
-=======
 from keras.models import Sequential
->>>>>>> 7697c73b937b1d61fde235ba062ab8df92f6ecf9
 from keras.layers.convolutional import Convolution2D
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras import backend as K
@@ -42,7 +37,7 @@ class bombrtrain:
         self.model.add(Dense(256, activation='relu'))
         self.model.add(Dropout(0.5))
         self.model.add(Dense(ACTION_CLASSES, activation='softmax'))
-        open('npyNmodel/model_0630_0302.json', 'w').write(self.model.to_json())
+        open('npyNmodel/model_dpn_Notmerge.json', 'w').write(self.model.to_json())
 
     def models_policy_train(self):
         if self.state_data != None and self.action_data != None :
@@ -74,26 +69,25 @@ class bombrtrain:
             if self.weights != None:
                 self.model.load_weights(self.weights)
             else:
-                self.weights = 'npyNmodel/weight_classified_dpn.h5'
+                self.weights = 'npyNmodel/weight_classified_dpn_Notmerge.h5'
             #fitting for '+1'
             self.classified = np.load(self.classified_data)
-            states_0 = np.asarray(self.classified[0][0])
-            actions_0 = np.asarray(self.classified[0][1])
-            states_3 = np.asarray(self.classified[1][0])
-            actions_3 = np.asarray(self.classified[1][1])
-            self.states_1 = np.concatenate((states_0 , states_3),axis=0)
-            print len(self.states_1)
-            self.actions_1 = np.concatenate ((actions_0 , actions_3),axis = 0)
-            print len(self.actions_1)
+            self.states_0 = np.asarray(self.classified[0][0])
+            self.actions_0 = np.asarray(self.classified[0][1])
+            self.states_1 = np.asarray(self.classified[1][0])
+            self.actions_1 = np.asarray(self.classified[1][1])
+            #self.states_1 = np.concatenate((states_0 , states_3),axis=0)
+            #print len(self.states_1)
+            #self.actions_1 = np.concatenate ((actions_0 , actions_3),axis = 0)
+            #print len(self.actions_1)
             callbacks = [
                 EarlyStopping(monitor='val_loss', patience=8, verbose=0),
                 ModelCheckpoint(filepath=self.weights, monitor='val_loss', save_best_only=True, verbose=0)
             ]
-            indices = np.arange(len(self.states_1))
+            indices = np.arange(len(self.states_0))
             np.random.shuffle(indices)
-            self.states_1 = self.states_1[indices]
-            self.actions_1 = self.actions_1[indices]
-            '''
+            self.states_0 = self.states_0[indices]
+            self.actions_0 = self.actions_0[indices]
             ind = np.arange(len(self.states_1))
             np.random.shuffle(ind)
             self.states_1 = self.states_1[ind]
@@ -101,11 +95,11 @@ class bombrtrain:
             
             self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
             self.model.summary()
-            self.model.fit(self.states_0, self.actions_0, batch_size=128, nb_epoch=2, verbose=1, validation_split=0.1, callbacks=callbacks)
-            '''
+            self.model.fit(self.states_0, self.actions_0, batch_size=128, nb_epoch=30, verbose=1, validation_split=0.1, callbacks=callbacks)
+            
             self.model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
             self.model.summary()
-            self.model.fit(self.states_1, self.actions_1, batch_size=128, nb_epoch=50, verbose=1, validation_split=0.1, callbacks=callbacks)
+            self.model.fit(self.states_1, self.actions_1, batch_size=32, nb_epoch=20, verbose=1, validation_split=0.1, callbacks=callbacks)
             
 
     def test_predict(self):
@@ -118,28 +112,28 @@ class bombrtrain:
             print (action)
 
     def dqnmodel_init(self, load_weights=False, weights_file="../dqnmodel_weight.h5"):
-      self.seq = np.load(self.option.seq)
-      self.dqn_datainit()
-      state_model = Sequential()
-      state_model.add(Reshape((1, BOMBR_ROW, BOMBR_COLUMN), input_shape=(BOMBR_ROW, BOMBR_COLUMN)))
-      state_model.add(Convolution2D(64, 3, 3, activation='relu'))
-      state_model.add(Convolution2D(64, 3, 3, activation='relu'))
-      state_model.add(Dropout(0.25))
-      state_model.add(Flatten())
-      state_model.add(Dense(128, activation='relu'))
+        self.seq = np.load(self.option.seq)
+        self.dqn_datainit()
+        state_model = Sequential()
+        state_model.add(Reshape((1, BOMBR_ROW, BOMBR_COLUMN), input_shape=(BOMBR_ROW, BOMBR_COLUMN)))
+        state_model.add(Convolution2D(64, 3, 3, activation='relu'))
+        state_model.add(Convolution2D(64, 3, 3, activation='relu'))
+        state_model.add(Dropout(0.25))
+        state_model.add(Flatten())
+        state_model.add(Dense(128, activation='relu'))
 
-      action_model = Sequential()
-      action_model.add(Dense(32, input_shape=(10,), activation='relu'))
-      action_model.add(Dense(32, activation='relu'))
-
-      merged = Merge([state_model, action_model], mode='concat')
-      final_model = Sequential()
-      final_model.add(merged)
-      final_model.add(Dense(200, activation='relu'))
-      final_model.add(Dense(200, activation='relu'))
-      final_model.add(Dense(1, activation='linear'))
-      open('dqnmodel.json', 'w').write(final_model.to_json())
-      self.dqnmodel = DQN(final_model, load_weights, weights_file)
+        action_model = Sequential()
+        action_model.add(Dense(32, input_shape=(10,), activation='relu'))
+        action_model.add(Dense(32, activation='relu'))
+        
+        merged = Merge([state_model, action_model], mode='concat')
+        final_model = Sequential()
+        final_model.add(merged)
+        final_model.add(Dense(200, activation='relu'))
+        final_model.add(Dense(200, activation='relu'))
+        final_model.add(Dense(1, activation='linear'))
+        open('dqnmodel.json', 'w').write(final_model.to_json())
+        self.dqnmodel = DQN(final_model, load_weights, weights_file)
 
     def dqn_datainit(self):
       self.all_action = list()

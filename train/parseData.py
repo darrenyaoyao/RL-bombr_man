@@ -2,8 +2,8 @@ import numpy as np
 import random
 BOMBR_COLUMN = 19
 BOMBR_ROW = 19
-FINALSTATE = np.full((19,19),3.0)
-#FINALSTATE = np.full(361,3.0)
+FINALSTATE = np.full((15,15),3.0)
+FINALACTION = np.full(10,1.0)
 REWARD = 0
 #ACTION_PERCENT_RETAIN = 0.2
 
@@ -115,16 +115,24 @@ class parseData:
             for d in ori_data:
                 timeslice = (np.fromstring(d, sep = ",")).astype(int)
                 action = np.zeros(10)
+                flag = np.zeros(3)
                 action[timeslice[0]] = 1
-                if len(timeslice) != 1:
-                    state = np.reshape( timeslice[1:], (BOMBR_ROW, BOMBR_COLUMN))
+                flag[timeslice[1]] = 1
+                if len(timeslice) != 2:
+                    state = np.reshape( timeslice[2:], (BOMBR_ROW, BOMBR_COLUMN))
+                    state = self.mergeflag(state,flag)
                     info = {'St':state , 'Rt1':REWARD}
                     if counter != 0:
                         data[counter-1]['At'] = action
                         data[counter-1]['St1'] = state
+                    if counter > 1 :
+                        data[counter-2]['At1'] = action
                     data.append(info)
                 else:
+                    if counter > 1:
                     data[counter-1]['At'] = action
+                    data[counter-2]['At1'] = action
+                    data[counter-1]['At1'] = FINALACTION
                     data[counter-1]['St1'] = FINALSTATE
                     data[counter-1]['Rt1'] = int(r.replace("\n",""))
                 if len(data) > 2:
@@ -133,6 +141,14 @@ class parseData:
                 counter = counter+1
             self.sequence.append(data)
 
+    def mergeflag(self, states, flag):
+        states = np.delete(states, (0,1,17,18), axis = 0)
+        states = np.delete(states, (0,1,17,18), axis = 1)
+        states[0][0] = flag[0]
+        states[0][1] = flag[1]
+        states[0][2] = flag[2]
+        return states
+    
     def spliter(self, string, splitElm):
         data = string.split(splitElm)
         data.pop()
