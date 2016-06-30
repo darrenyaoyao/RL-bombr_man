@@ -67,10 +67,9 @@ class bombrtrain:
 
     def dqnmodel_init(self, load_weights=False, weights_file="./model/dqn_new_reward.h5"):
       self.seq = np.load(self.option.seq)
-      self.dqn_datainit()
       state_model = Sequential()
       state_model.add(Reshape((1, BOMBR_ROW, BOMBR_COLUMN), input_shape=(BOMBR_ROW, BOMBR_COLUMN)))
-      state_model.add(Convolution2D(64, 3, 3, activation='relu'))
+      state_model.add(Convolution2D(64, 5, 5, activation='relu'))
       state_model.add(Convolution2D(64, 3, 3, activation='relu'))
       state_model.add(Dropout(0.25))
       state_model.add(Flatten())
@@ -83,26 +82,17 @@ class bombrtrain:
       merged = Merge([state_model, action_model], mode='concat')
       final_model = Sequential()
       final_model.add(merged)
-      final_model.add(Dense(512, activation='relu'))
-      final_model.add(Dense(512, activation='relu'))
+      final_model.add(Dense(256, activation='relu'))
+      final_model.add(Dense(256, activation='relu'))
       final_model.add(Dense(1, activation='linear'))
       open('dqnmodel.json', 'w').write(final_model.to_json())
       self.dqnmodel = DQN(final_model, load_weights, weights_file)
 
-    def dqn_datainit(self):
-      self.all_action = list()
-      for i in range(10):
-        action = np.zeros(10)
-        action[i] = 1
-        self.all_action.append(action)
-      self.dqn_data = list()
-      for i in range(len(self.seq)):
-        for j in range(len(self.seq[i])):
-          if (len(self.seq[i])-j) < 3 and self.seq[i][-1]['Rt1'] == 1:
-            self.dqn_data.append(self.seq[i][j])
-
     def dqn_train(self):
-      self.dqnmodel.train(self.seq, self.all_action, 0.999)
+      self.dqnmodel.train(self.seq, self.all_action, 0.96)
+
+    def sarsa_train(self):
+      self.dqnmodel.sarsa_train(self.seq, 0.96)
 
     def dqn_train_test(self):
       for game in self.seq:

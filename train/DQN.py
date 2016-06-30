@@ -74,6 +74,61 @@ class DQN:
          npactions = np.array(actions)
          self.model.save_weights(self.weight_file)
 
+   def sarsa_train(self, data, gamma=0.999, batch_size=32, nb_epoch=200,
+         nb_iter=20, optimizer='adam'):
+      self.optimizer = optimizer
+      self.gamma = gamma
+      states = [] #list of numpy array
+      rewards = []
+      actions = []
+      next_states = []
+      num = 1
+      for i in range(len(data)):
+         if len(data[i])-num >= 0:
+            for j in range(len(data[i])-num, len(data[i])):
+               states.append(data[i][j]['St'])
+               rewards.append(data[i][j]['Rt1'])
+               actions.append(data[i][j]['At'])
+               next_states.append(data[i][j]['St1'])
+         else:
+            for j in range(0, len(data[i])):
+               states.append(data[i][j]['St'])
+               rewards.append(data[i][j]['Rt1'])
+               actions.append(data[i][j]['At'])
+               next_actions.append(data[i][j]['At1'])
+               next_states.append(data[i][j]['St1'])
+      npstates = np.array(states)
+      npactions = np.array(actions)
+      npnext_actions = np.array(next_actions)
+      npnext_states = np.array(next_states)
+
+      self.model.compile(loss='mean_squared_error', optimizer=optimizer)
+      self.model.summary()
+      self.save_model_weight()
+      for x in range(nb_epoch):
+         print "All Date Epoch "+str(x)+"/"+str(nb_epoch)
+         self.update_evalute_model_weight()
+         self.targets = self.evalute_model.predict([npnext_states, npnext_actions])
+         print "Start fit"
+         print self.targets
+         self.model.fit([npstates, npactions], self.targets, batch_size, nb_iter, verbose=1, validation_split=0, shuffle=True)
+         print "Finish fit"
+         self.save_model_weight()
+         #update_data
+         num += 1
+         for i in range(len(data)):
+            if len(data[i])-num >= 0:
+               states.append(data[i][len(data[i])-num]['St'])
+               actions.append(data[i][len(data[i])-num]['At'])
+               rewards.append(data[i][len(data[i])-num]['Rt1'])
+               next_actions.append(data[i][len(data[i])-num]['At1'])
+               next_states.append(data[i][len(data[i])-num]['St1'])
+         npstates = np.array(states)
+         npactions = np.array(actions)
+         npnext_actions = np.array(next_actions)
+         npnext_states = np.array(next_states)
+         self.model.save_weights(self.weight_file)
+
    def update_target(self, reward, next_state):
       self.targets = []
       x, a = self.collect_predict_data(reward, next_state)
