@@ -1,12 +1,12 @@
 from keras.models import Sequential
 from keras.layers.core import Dense, Dropout, Flatten, Reshape, Merge
-from keras.layers.convolutional import Convolution2D
+from keras.layers.convolutional import Convolution2D, ZeroPadding2D
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.models import model_from_json
 import numpy as np
 from DQN import DQN
-BOMBR_COLUMN = 19
-BOMBR_ROW = 19
+BOMBR_COLUMN = 15
+BOMBR_ROW = 15
 ACTION_CLASSES = 10
 FEATURE_CLASSES = 6
 
@@ -27,21 +27,23 @@ class bombrtrain:
     def models_init(self):
         self.model = Sequential()
         self.model.add(Reshape((1, BOMBR_ROW, BOMBR_COLUMN), input_shape=(BOMBR_ROW, BOMBR_COLUMN)))
-        self.model.add(Convolution2D(64, 3, 3, activation='relu'))
-        self.model.add(Convolution2D(64, 3, 3, activation='relu'))
+        self.model.add(ZeroPadding2D(padding=(1, 1)))
+        self.model.add(Convolution2D(128, 3, 3, activation='relu'))
+        self.model.add(ZeroPadding2D(padding=(1, 1)))
         self.model.add(Convolution2D(128, 3, 3, activation='relu'))
         self.model.add(Dropout(0.25))
         self.model.add(Flatten())
         self.model.add(Dense(256, activation='relu'))
         self.model.add(Dropout(0.5))
+        self.model.add(Dense(256, activation='relu'))
         self.model.add(Dense(ACTION_CLASSES, activation='softmax'))
-        open('model_1.json', 'w').write(self.model.to_json())
+        open('../model/new_model.json', 'w').write(self.model.to_json())
 
     def models_policy_train(self):
         if self.weights != None:
             self.model.load_weights(self.weights)
         else:
-            self.weights = 'model_weight_1.h5'
+            self.weights = '../model/new_model_weight.h5'
         self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         self.model.summary()
         self.states = np.load(self.state_data)

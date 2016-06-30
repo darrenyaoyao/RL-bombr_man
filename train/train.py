@@ -13,6 +13,4 @@ parser.add_argument('-A', action="store", dest='action')
 parser.add_argument('-F', action="store", dest='feature')
 
 Bombr_train = bombrtrain(parser.parse_args())
-#Bombr_train.models_policy_train()
-Bombr_train.model_feature_init()
-Bombr_train.model_feature_train()
+Bombr_train.models_policy_train()
