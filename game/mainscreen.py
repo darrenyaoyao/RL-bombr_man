@@ -20,7 +20,7 @@ import serge.blocks.animations
 import serge.blocks.textgenerator
 
 from theme import G, theme
-import common
+import common 
 import board
 import man
 import player
@@ -243,6 +243,8 @@ class MainScreen(serge.blocks.actors.ScreenActor):
             self.board.observation[-1]["flag"] = 2
         #
         # Watch for restarting game
+        if len(self.board.observation) > 1:
+            print self.board.observation[-2]
         if self._game_over:
             if self.keyboard.isClicked(pygame.K_RETURN):
                 self.restartGame()
@@ -448,11 +450,11 @@ class MainScreen(serge.blocks.actors.ScreenActor):
         self.music = serge.sound.Music.getItem(common.levels.LEVELS[self.current_level - 1][1])
         #
         # Add the player
-
+        
         self.player = serge.blocks.utils.addActorToWorld(
             self.world,
             man.Man('man', 'player', 'tiles-6', self.board,
-                    ai.AI() if G('all-ai') else play_ai.PlayerAI()),
+                    ai.AI() if G('all-ai') else player.Player()),
             layer_name='men'
         )
 
@@ -554,7 +556,7 @@ def main(options, observation):
     #
     # Screenshots
     if options.screenshot:
-        manager.assignBehaviour(None,
+        manager.assignBehaviour(None, 
             serge.blocks.behaviours.SnapshotOnKey(key=pygame.K_s, size=G('screenshot-size')
                 , overwrite=False, location='screenshots'), 'screenshots')
 
