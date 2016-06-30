@@ -10,6 +10,8 @@ import serge.engine
 import serge.sound
 
 from theme import G
+
+from find_feature import find_feature
 BOMBR_COLUMN = 19
 BOMBR_ROW = 19
 
@@ -46,6 +48,8 @@ class PlayerAI(object):
             direction = self.supervised_policy(last_state)
         elif board.options.dqn:
             direction = self.dqn_policy(last_state)
+        elif board.options.feature_supervised_policy:
+            direction = self.feature_supervised_policy(board.observation, last_state)
 
         if direction == (-1, 0):
             current_state["action"] = 2
@@ -78,8 +82,8 @@ class PlayerAI(object):
                 self.bomb = False
 
     def initialmodel(self):
-        self.model = model_from_json(open("./train/model.json").read())
-        self.model.load_weights("./train/model_weight.h5")
+        self.model = model_from_json(open("./train/model_feature.json").read())
+        self.model.load_weights("./train/model_feature_weight.h5")
         self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         self.dqnmodel = model_from_json(open("/home/ron/dqnmodel.json").read())
         self.dqnmodel.load_weights("/home/ron/dqnmodel_weight.h5")
@@ -152,3 +156,18 @@ class PlayerAI(object):
             return (0, -1)
         else:
             return None
+
+    def feature_supervised_policy(self, observation, agent_dic):
+        if agent_dic["observation"] != []:
+            obser = np.reshape( agent_dic["observation"], (BOMBR_ROW, BOMBR_COLUMN))
+        else:
+            obser = np.zeros((BOMBR_ROW, BOMBR_COLUMN))
+        obser_arr = np.zeros((1, BOMBR_ROW, BOMBR_COLUMN))
+        obser_arr[0] = obser
+        f = find_feature()
+        feature = f.parse_feature(observation, obser)
+        print type(feature)
+        features = np.array((1, 6))
+        features[0] = np.array(feature)
+        action = self.model.predict_classes([obser_arr, features])
+        return self.action2direction(action, agent_dic)

@@ -3,7 +3,7 @@ import sys
 
 BOMBR_ROW = 19
 BOMBR_COLUMN = 19
-DEFAULT = 15*(2**0.5)
+DEFAULT = int(15*(2**0.5))
 
 class find_feature():
     def __init__(self):
@@ -59,7 +59,7 @@ class find_feature():
         s = obser
         default_feature = [DEFAULT, DEFAULT, DEFAULT, DEFAULT, DEFAULT, 4]
         if (s == np.zeros((BOMBR_ROW, BOMBR_COLUMN))).all():
-            return default_feature
+            return np.asarray(default_feature)
         features = []
         player_pos = []
         ai_pos = []
@@ -101,10 +101,10 @@ class find_feature():
                     tmp.append(i)
                     tmp.append(j)
                     explosion_pos.append(tmp)
-        features.append(find_distance(player_pos, ai_pos))
-        features.append(find_nearest(player_pos, flag_pos)) #if no flag, distance = 19*(2**0.5)
-        features.append(find_nearest(player_pos, box_pos)) #if no box in 5*5, distance = 19*(2**0.5)
-        features.append(find_nearest(player_pos, bomb_pos)) #if no bomb in 5*5, distance = 19*(2**0.5)
-        features.append(find_nearest(player_pos, explosion_pos)) #if no explosion in 5*5, distance = 19*(2**0.5)
-        features.append(check_direction(player_pos, s))
-        return np.asarray(features)
+        features.append(self.find_distance(player_pos, ai_pos))
+        features.append(self.find_nearest(player_pos, flag_pos)) #if no flag, distance = 19*(2**0.5)
+        features.append(self.find_nearest(player_pos, box_pos)) #if no box in 5*5, distance = 19*(2**0.5)
+        features.append(self.find_nearest(player_pos, bomb_pos)) #if no bomb in 5*5, distance = 19*(2**0.5)
+        features.append(self.find_nearest(player_pos, explosion_pos)) #if no explosion in 5*5, distance = 19*(2**0.5)
+        features.append(self.check_direction(player_pos, s))
+        return features

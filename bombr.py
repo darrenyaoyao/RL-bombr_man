@@ -54,6 +54,8 @@ parser.add_option("-P", "--supervised_policy", dest="supervised_policy", default
                   help="supervised_policy")
 parser.add_option("-Q", "--dqn_policy", dest="dqn", default=False, action="store_true",
                   help="dqn")
+parser.add_option("-F", "--feature_supervised_policy", dest="feature_supervised_policy", default=False,
+                  action="store_true", help="supervised_policy")
 
 observation = [{"action": 0, "flag": 0, "observation": []}]
 (options, args) = parser.parse_args()
