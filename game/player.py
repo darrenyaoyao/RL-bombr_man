@@ -80,8 +80,8 @@ class Player(object):
                 serge.sound.Sounds.play('drop')
 
     def initialmodel(self):
-        self.model = model_from_json(open("./train/npyNmodel/model.json").read())
-        self.model.load_weights("./train/npyNmodel/model_weight_policy.h5")
+        self.model = model_from_json(open("./train/modelNweight/model_0630_0302.json").read())
+        self.model.load_weights("./train/modelNweight/weight_0630_0302.h5")
         self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
     def supervised_policy(self, agent_dic):
