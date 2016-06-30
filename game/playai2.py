@@ -81,8 +81,8 @@ class PlayerAI2(object):
                 self.bomb = False
 
     def initialmodel(self):
-        self.model = model_from_json(open("./train/model_feature.json").read())
-        self.model.load_weights("./train/model_feature_weight.h5")
+        self.model = model_from_json(open("../model/model_withflag_all.json").read())
+        self.model.load_weights("../model/weight_withflag_all_policy.h5")
         self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         self.Qmodel = model_from_json(open("/home/ron/dqnmodel.json").read())
         self.Qmodel.load_weights("/home/ron/dqnmodel_weight.h5")
@@ -93,9 +93,11 @@ class PlayerAI2(object):
             obser = np.reshape( agent_dic["observation"], (BOMBR_ROW, BOMBR_COLUMN))
         else:
             obser = np.zeros((BOMBR_ROW, BOMBR_COLUMN))
-        observation = np.zeros((1, BOMBR_ROW, BOMBR_COLUMN))
+        observation = np.zeros((1, 15, 15))
         observation[0] = self.transform(obser, agent_dic["flag"])
+        print observation[0]
         action = self.model.predict_classes(observation)
+        print action
         return self.action2direction(action, agent_dic)
 
     def Q_policy(self, agent_dic):
@@ -125,7 +127,7 @@ class PlayerAI2(object):
 
     def transform(self, obser, flag):
         states = np.delete(obser, (0,1,17,18), axis = 0 )
-        states = np.delete(obser, (0,1,17,18), axis = 1 )
+        states = np.delete(states, (0,1,17,18), axis = 1 )
         states[0][0] = 0
         states[0][1] = 0
         states[0][2] = 0

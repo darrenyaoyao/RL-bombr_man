@@ -1,4 +1,5 @@
-for i in {1..2000}
+for i in {1..1000}
 do
-  python2 bombr.py -O ai_withflag.obser -W ai_withflag.reward
+  printf $i
+  python2 bombr.py -O ai_withflag_new.obser -W ai_withflag_new.reward
 done

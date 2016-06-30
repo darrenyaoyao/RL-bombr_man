@@ -180,17 +180,17 @@ class Board(serge.blocks.actors.ScreenActor):
                 agent_dic["observation"].append(int(sprite.name[-1]))
         for man in self.men:
             if man.name == "player":
-                agent_dic["observation"][self.men[man][0]+19*self.men[man][1]] = 6
+                agent_dic["observation"][self.men[man][1]+19*self.men[man][0]] = 6
             elif man.name == "ai":
-                agent_dic["observation"][self.men[man][0]+19*self.men[man][1]] = 7
+                agent_dic["observation"][self.men[man][1]+19*self.men[man][0]] = 7
             elif man.__class__.__name__ == "Bomb":
-                agent_dic["observation"][self.men[man][0]+19*self.men[man][1]] = 8
+                agent_dic["observation"][self.men[man][1]+19*self.men[man][0]] = 8
             elif man.__class__.__name__ == "Explosion":
-                agent_dic["observation"][self.men[man][0]+19*self.men[man][1]] = 9
+                agent_dic["observation"][self.men[man][1]+19*self.men[man][0]] = 9
             elif man.__class__.__name__ == "Flag":
-                agent_dic["observation"][self.men[man][0]+19*self.men[man][1]] = 0
+                agent_dic["observation"][self.men[man][1]+19*self.men[man][0]] = 0
             else:
-                agent_dic["observation"][self.men[man][0]+19*self.men[man][1]] = 3
+                agent_dic["observation"][self.men[man][1]+19*self.men[man][0]] = 3
         self.observation.append({"action": 0, "flag": 0, "observation": []})
     def addFootsteps(self, (x, y), (dx, dy)):
         """Add some footsteps to the screen"""
