@@ -1,9 +1,9 @@
 from keras.models import Sequential
-from keras.layers.core import Dense, Dropout, Flatten, Reshape, Merge
 from keras.layers.convolutional import Convolution2D
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras import backend as K
 from keras.models import model_from_json
+from keras.layers.core import Dense, Dropout, Flatten, Reshape, Merge
 import numpy as np
 from DQN import DQN
 BOMBR_COLUMN = 19
@@ -72,29 +72,35 @@ class bombrtrain:
                 self.weights = 'npyNmodel/weight_classified_dpn.h5'
             #fitting for '+1'
             self.classified = np.load(self.classified_data)
-            self.states_0 = np.asarray(self.classified[0][0])
-            self.actions_0 = np.asarray(self.classified[0][1])
-            self.states_1 = np.asarray(self.classified[1][0])
-            self.actions_1 = np.asarray(self.classified[1][1])
+            states_0 = np.asarray(self.classified[0][0])
+            actions_0 = np.asarray(self.classified[0][1])
+            states_3 = np.asarray(self.classified[1][0])
+            actions_3 = np.asarray(self.classified[1][1])
+            self.states_1 = np.concatenate((states_0 , states_3),axis=0)
+            print len(self.states_1)
+            self.actions_1 = np.concatenate ((actions_0 , actions_3),axis = 0)
+            print len(self.actions_1)
             callbacks = [
                 EarlyStopping(monitor='val_loss', patience=8, verbose=0),
                 ModelCheckpoint(filepath=self.weights, monitor='val_loss', save_best_only=True, verbose=0)
             ]
-            indices = np.arange(len(self.states_0))
+            indices = np.arange(len(self.states_1))
             np.random.shuffle(indices)
-            self.states_0 = self.states_0[indices]
-            self.actions_0 = self.actions_0[indices]
+            self.states_1 = self.states_1[indices]
+            self.actions_1 = self.actions_1[indices]
+            '''
             ind = np.arange(len(self.states_1))
             np.random.shuffle(ind)
             self.states_1 = self.states_1[ind]
             self.actions_1 = self.actions_1[ind]
-            for i in range(25):
-                self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-                self.model.summary()
-                self.model.fit(self.states_0, self.actions_0, batch_size=128, nb_epoch=2, verbose=1, validation_split=0.1, callbacks=callbacks)
-                self.model.compile(loss=self.inverse_categorical_crossentropy, optimizer='adam', metrics=['accuracy'])
-                self.model.summary()
-                self.model.fit(self.states_1, self.actions_1, batch_size=64, nb_epoch=2, verbose=1, validation_split=0.08, callbacks=callbacks)
+            
+            self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+            self.model.summary()
+            self.model.fit(self.states_0, self.actions_0, batch_size=128, nb_epoch=2, verbose=1, validation_split=0.1, callbacks=callbacks)
+            '''
+            self.model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
+            self.model.summary()
+            self.model.fit(self.states_1, self.actions_1, batch_size=128, nb_epoch=50, verbose=1, validation_split=0.1, callbacks=callbacks)
             
 
     def test_predict(self):
