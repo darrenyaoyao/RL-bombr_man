@@ -28,10 +28,10 @@ class bombrtrain:
     def models_init(self):
         self.model = Sequential()
         self.model.add(Reshape((1, BOMBR_ROW, BOMBR_COLUMN), input_shape=(BOMBR_ROW, BOMBR_COLUMN)))
-        self.model.add(Convolution2D(64, 3, 3, activation='relu'))
-        self.model.add(Convolution2D(64, 3, 3, activation='relu'))
-        self.model.add(Convolution2D(128, 3, 3, activation='relu'))
-        self.model.add(Convolution2D(128, 3, 3, activation='relu'))
+        self.model.add(Convolution2D(64, 5, 5, activation='relu'))
+        self.model.add(Convolution2D(64, 5, 5, activation='relu'))
+        self.model.add(Convolution2D(128, 5, 5, activation='relu'))
+        self.model.add(Convolution2D(128, 5, 5, activation='relu'))
         self.model.add(Dropout(0.25))
         self.model.add(Flatten())
         self.model.add(Dense(256, activation='relu'))
@@ -58,7 +58,7 @@ class bombrtrain:
                 EarlyStopping(monitor='val_loss', patience=8, verbose=0),
                 ModelCheckpoint(filepath=self.weights, monitor='val_loss', save_best_only=True, verbose=0)
             ]
-            self.model.fit(self.states, self.actions, batch_size=128, nb_epoch=35, verbose=1, validation_split=0.1, callbacks=callbacks)
+            self.model.fit(self.states, self.actions, batch_size=128, nb_epoch=20, verbose=1, validation_split=0.1, callbacks=callbacks)
 
     def inverse_categorical_crossentropy(self, y_true, y_pred):
         return K.categorical_crossentropy(y_pred, y_true)**(-1)
@@ -95,12 +95,12 @@ class bombrtrain:
             
             self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
             self.model.summary()
-            self.model.fit(self.states_0, self.actions_0, batch_size=128, nb_epoch=30, verbose=1, validation_split=0.1, callbacks=callbacks)
-            
+            self.model.fit(self.states_0, self.actions_0, batch_size=128, nb_epoch=20, verbose=1, validation_split=0.1, callbacks=callbacks)
+            '''          
             self.model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
             self.model.summary()
-            self.model.fit(self.states_1, self.actions_1, batch_size=32, nb_epoch=20, verbose=1, validation_split=0.1, callbacks=callbacks)
-            
+            self.model.fit(self.states_1, self.actions_1, batch_size=64, nb_epoch=20, verbose=1, validation_split=0.1, callbacks=callbacks)
+            '''
 
     def test_predict(self):
         self.model.load_weights(self.weights)
