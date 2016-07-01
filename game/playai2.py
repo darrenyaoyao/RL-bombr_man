@@ -81,12 +81,12 @@ class PlayerAI2(object):
                 self.bomb = False
 
     def initialmodel(self):
-        self.model = model_from_json(open("../model/model_withflag_all.json").read())
-        self.model.load_weights("../model/weight_withflag_all_policy.h5")
+        self.model = model_from_json(open("./train/modelNweight/new_model_withflag.json").read())
+        self.model.load_weights("./train/modelNweight/new_weight_withflag.h5")
         self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-        self.Qmodel = model_from_json(open("/home/ron/dqnmodel.json").read())
-        self.Qmodel.load_weights("/home/ron/dqnmodel_weight.h5")
-        self.Qmodel.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
+        #self.Qmodel = model_from_json(open("/home/ron/dqnmodel.json").read())
+        #self.Qmodel.load_weights("/home/ron/dqnmodel_weight.h5")
+        #self.Qmodel.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
 
     def supervised_policy(self, agent_dic):
         if agent_dic["observation"] != []:
