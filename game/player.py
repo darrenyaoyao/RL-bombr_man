@@ -49,10 +49,10 @@ class Player(object):
                 current_state["action"] = 4
             if self.keyboard.isDown(pygame.K_UP):
                 direction = (0, -1)
-                current_state["action"] = 6
+                current_state["action"] = 8
             if self.keyboard.isDown(pygame.K_DOWN):
                 direction = (0, +1)
-                current_state["action"] = 8
+                current_state["action"] = 6
 
         #
         # Check that we can go there
@@ -80,8 +80,13 @@ class Player(object):
                 serge.sound.Sounds.play('drop')
 
     def initialmodel(self):
+<<<<<<< HEAD
         self.model = model_from_json(open("./train/npyNmodel/model_dpn_Notmerge.json").read())
         self.model.load_weights("./train/npyNmodel/weight_classified_dpn_Notmerge.h5")
+=======
+        self.model = model_from_json(open("./train/model_feature.json").read())
+        self.model.load_weights("./train/model_feature_weight.h5")
+>>>>>>> master
         self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
     def supervised_policy(self, agent_dic):
@@ -92,7 +97,6 @@ class Player(object):
         observation = np.zeros((1, BOMBR_ROW, BOMBR_COLUMN))
         observation[0] = obser
         action = self.model.predict_classes(observation)
-        print (action)
         if action % 2 == 1:
             self.bomb = True
         else:

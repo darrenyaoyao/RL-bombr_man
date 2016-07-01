@@ -52,15 +52,19 @@ parser.add_option("-R", "--random", dest="random", default=False, action="store_
                   help="random policy")
 parser.add_option("-P", "--supervised_policy", dest="supervised_policy", default=False, action="store_true",
                   help="supervised_policy")
+parser.add_option("-Q", "--Qmodel", dest="Qmodel", default=False, action="store_true",
+                  help="Qmodel")
+parser.add_option("-F", "--feature_supervised_policy", dest="feature_supervised_policy", default=False,
+                  action="store_true", help="supervised_policy")
 
-observation = [{"action": 0, "observation": []}]
+observation = [{"action": 0, "flag": 0, "observation": []}]
 (options, args) = parser.parse_args()
 serge.common.logger.setLevel(options.log)
 
 import game.main
 import levels
 import game.common
-  
+
 
 game.common.levels = levels
 game.main.main(options, args, observation)

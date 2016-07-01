@@ -1,11 +1,12 @@
 *.obser
 *.reward
 *.pyc
-*/*.pyc
-*/*/*.pyc
+game/*.pyc
+levels/*.pyc
+serge/*.pyc
+train/*.pyc
+networkx/*.pyc
 *.npy
-*/*.npy
 *.xml
-*/*.xml
 *.png
-*/*.png
+train/*.npy

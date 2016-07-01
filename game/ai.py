@@ -352,18 +352,6 @@ class AI(serge.common.Loggable):
             agent_dic["action"] = 8
         else:
             agent_dic["action"] = 0
-        if agent_dic["action"] == 2:
-            print ("left")
-        elif agent_dic["action"] == 4:
-            print ("right")
-        elif agent_dic["action"] == 6:
-            print ("up")
-        elif agent_dic["action"] == 8:
-            print ("down")
-        else:
-            print ("None") 
-        
-
 
 class AIUI(serge.actor.Actor):
     """A user interface to report on the state of the AI"""

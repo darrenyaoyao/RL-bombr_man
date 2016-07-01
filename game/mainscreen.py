@@ -20,7 +20,7 @@ import serge.blocks.animations
 import serge.blocks.textgenerator
 
 from theme import G, theme
-import common 
+import common
 import board
 import man
 import player
@@ -28,7 +28,8 @@ import ai
 import smacktalker
 import giftbox
 import flagstatus
-
+import play_ai
+import playai2
 
 # Score panel frames
 F_TIE = 0
@@ -53,6 +54,7 @@ class MainScreen(serge.blocks.actors.ScreenActor):
         self.death_music = serge.sound.Music.getItem('death-music')
         self.success_music = serge.sound.Music.getItem('success-music')
         self.observation = observation
+        self.start_time = time.time()
         #
         self.generator = serge.blocks.textgenerator.TextGenerator()
         self.generator.addExamplesFromFile(os.path.join('game', 'smack-talk.txt'))
@@ -233,6 +235,12 @@ class MainScreen(serge.blocks.actors.ScreenActor):
     def updateActor(self, interval, world):
         """Update this actor"""
         super(MainScreen, self).updateActor(interval, world)
+        if self.flag_status_panel.currently_carrying == "None":
+            self.board.observation[-1]["flag"] = 0
+        elif self.flag_status_panel.currently_carrying == "player":
+            self.board.observation[-1]["flag"] = 1
+        elif self.flag_status_panel.currently_carrying == "ai":
+            self.board.observation[-1]["flag"] = 2
         #
         # Watch for restarting game
         if self._game_over:
@@ -282,7 +290,7 @@ class MainScreen(serge.blocks.actors.ScreenActor):
         """The player has died"""
         # write out reward
         with open(self.options.reward, 'a') as f:
-            f.write("-1\n")
+            f.write(str(-100)+"\n")
         if not self.player.is_dead:
             serge.sound.Sounds.play('death')
             self.board.addGore(self.player)
@@ -302,7 +310,7 @@ class MainScreen(serge.blocks.actors.ScreenActor):
         """The AI has died"""
         # write out reward
         with open(self.options.reward, 'a') as f:
-            f.write("1\n")
+            f.write("100\n")
         if not self.ai.is_dead:
             serge.sound.Sounds.play('death')
             self.board.addGore(self.ai)
@@ -440,7 +448,7 @@ class MainScreen(serge.blocks.actors.ScreenActor):
         self.music = serge.sound.Music.getItem(common.levels.LEVELS[self.current_level - 1][1])
         #
         # Add the player
-        
+
         self.player = serge.blocks.utils.addActorToWorld(
             self.world,
             man.Man('man', 'player', 'tiles-6', self.board,
@@ -546,7 +554,7 @@ def main(options, observation):
     #
     # Screenshots
     if options.screenshot:
-        manager.assignBehaviour(None, 
+        manager.assignBehaviour(None,
             serge.blocks.behaviours.SnapshotOnKey(key=pygame.K_s, size=G('screenshot-size')
                 , overwrite=False, location='screenshots'), 'screenshots')
 

@@ -21,6 +21,7 @@ class parseData:
         #classified[0]: +1 [1] : -1
         #classified['X'][0]:states
         #classified['X'][1]:actions
+<<<<<<< HEAD
         self.classified =  [[[],[]],[[],[]]]
         action0 = np.zeros(10)
         action0[0] = 1
@@ -45,6 +46,33 @@ class parseData:
                     else:
                         self.classified[0][0].append(self.sequence[i][-j-1]['St'])
                         self.classified[0][1].append(self.sequence[i][-j-1]['At'])
+=======
+        if self.save_classify != None:
+            self.classified =  [[[],[]],[[],[]]]
+            action0 = np.zeros(10)
+            action0[0] = 1
+            flag = 0
+            for i in range(len(self.sequence)):
+                flag = self.sequence[i][-1]['Rt1']
+                for j in range(len(self.sequence[i])):
+                    if j > 140:
+                        ACTION_PERCENT_RETAIN = 0.18
+                    else:
+                        ACTION_PERCENT_RETAIN = 0.35
+                    if ((self.sequence[i][-j-1]['At']==action0).all()) and (random.random() > ACTION_PERCENT_RETAIN):
+                        pass
+                    else:
+                        if flag == int(-100):
+                            if j < 20:
+                                self.classified[1][0].append(self.sequence[i][-j-1]['St'])
+                                self.classified[1][1].append(self.inverse_action(self.sequence[i][-j-1]['At']))
+                            else:
+                                self.classified[0][0].append(self.sequence[i][-j-1]['St'])
+                                self.classified[0][1].append(self.sequence[i][-j-1]['At'])
+                        else:
+                            self.classified[0][0].append(self.sequence[i][-j-1]['St'])
+                            self.classified[0][1].append(self.sequence[i][-j-1]['At'])
+>>>>>>> master
 
     def inverse_action(self, action):
         index = np.where(action == 1)[0]
@@ -55,6 +83,7 @@ class parseData:
         if len(index) != 0 :
             new_action[index[0]] = 0
         return new_action
+<<<<<<< HEAD
 
     def policy_train_data(self):
         self.states = []
@@ -72,6 +101,26 @@ class parseData:
                 else:
                     self.states.append(self.sequence[i][j]['St'])
                     self.actions.append(self.sequence[i][j]['At'])
+=======
+    
+    def policy_train_data(self):
+        if self.save_state != None and self.save_action != None:
+            self.states = []
+            self.actions = []
+            action0 = np.zeros(10)
+            action0[0] = 1
+            for i in range(len(self.sequence)):
+                for j in range(len(self.sequence[i])):
+                    if j < 70:
+                        ACTION_PERCENT_RETAIN = 0.18
+                    else:
+                        ACTION_PERCENT_RETAIN = 0.35
+                    if ((self.sequence[i][j]['At']==action0).all()) and (random.random() > ACTION_PERCENT_RETAIN):
+                        pass
+                    else:
+                        self.states.append(self.sequence[i][j]['St'])
+                        self.actions.append(self.sequence[i][j]['At'])
+>>>>>>> master
 
     def getDataDistribution(self):
         try:
@@ -148,11 +197,20 @@ class parseData:
         states[0][1] = flag[1]
         states[0][2] = flag[2]
         return states
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> master
     def spliter(self, string, splitElm):
         data = string.split(splitElm)
         data.pop()
         return data
+    
+    def save_classify_data(self):
+        classify = np.asarray(self.classified)
+        if self.save_classify != None:
+            np.save(self.save_classify, classify)
 
     def save_classify_data(self):
         classify = np.asarray(self.classified)
