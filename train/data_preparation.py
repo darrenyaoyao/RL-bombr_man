@@ -17,22 +17,14 @@ Bombr_data = parseData(parser.parse_args())
 Bombr_data.policy_train_data()
 Bombr_data.classified_train_data():
 Bombr_data.getDataDistribution()
-<<<<<<< HEAD
-Bombr_data.classified_train_data()
 Bombr_data.getClassifyDistribution()
 Bombr_data.save_npy()
 Bombr_data.save_sequence()
 Bombr_data.save_classify_data()
-print ("action distribution: ")
-print (Bombr_data.act_Distribution)
-print ("After classifiy, action distribution: ")
-print ("Reward +1 & -1 front")
-print (Bombr_data.act0_Distribution)
-print ("Reward -1 last 70 steps ")
-print (Bombr_data.act1_Distribution)
-=======
-Bombr_data.getClassifyDistribution():
-Bombr_data.save_npy()
-Bombr_data.save_sequence()
-Bombr_data.save_classify_data():
->>>>>>> master
+#print ("action distribution: ")
+#print (Bombr_data.act_Distribution)
+#print ("After classifiy, action distribution: ")
+#print ("Reward +1 & -1 front")
+#print (Bombr_data.act0_Distribution)
+#print ("Reward -1 last 70 steps ")
+#print (Bombr_data.act1_Distribution)

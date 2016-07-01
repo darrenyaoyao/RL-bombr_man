@@ -1,25 +1,11 @@
 from keras.models import Sequential
-<<<<<<< HEAD
-from keras.layers.convolutional import Convolution2D
-from keras.callbacks import EarlyStopping, ModelCheckpoint
+from keras.layers.core import Dense, Dropout, Flatten, Reshape, Merge
 from keras import backend as K
-from keras.models import model_from_json
-from keras.layers.core import Dense, Dropout, Flatten, Reshape, Merge
-=======
-from keras.layers.core import Dense, Dropout, Flatten, Reshape, Merge
 from keras.layers.convolutional import Convolution2D, ZeroPadding2D
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.models import model_from_json
->>>>>>> master
 import numpy as np
-<<<<<<< HEAD
 #from DQN import DQN
-=======
-from DQN import DQN
-<<<<<<< HEAD
-=======
->>>>>>> d92eb4deeb01cea0b68c9a235f81a36e4c0b66d4
->>>>>>> master
 BOMBR_COLUMN = 15
 BOMBR_ROW = 15
 ACTION_CLASSES = 10
@@ -44,30 +30,17 @@ class bombrtrain:
     def models_init(self):
         self.model = Sequential()
         self.model.add(Reshape((1, BOMBR_ROW, BOMBR_COLUMN), input_shape=(BOMBR_ROW, BOMBR_COLUMN)))
-<<<<<<< HEAD
-        self.model.add(Convolution2D(128, 5, 5, activation='relu'))
-        self.model.add(Convolution2D(64, 3, 3, activation='relu'))
-=======
         self.model.add(ZeroPadding2D(padding=(1, 1)))
         self.model.add(Convolution2D(128, 3, 3, activation='relu'))
         self.model.add(ZeroPadding2D(padding=(1, 1)))
         self.model.add(Convolution2D(128, 3, 3, activation='relu'))
->>>>>>> master
         self.model.add(Dropout(0.25))
         self.model.add(Flatten())
         self.model.add(Dense(256, activation='relu'))
         self.model.add(Dropout(0.5))
         self.model.add(Dense(256, activation='relu'))
         self.model.add(Dense(ACTION_CLASSES, activation='softmax'))
-<<<<<<< HEAD
-        open('modelNweight/model_withflag_all.json', 'w').write(self.model.to_json())
-=======
-<<<<<<< HEAD
         open('./model_default.json', 'w').write(self.model.to_json())
-=======
-        open('../model/new_model.json', 'w').write(self.model.to_json())
->>>>>>> d92eb4deeb01cea0b68c9a235f81a36e4c0b66d4
->>>>>>> master
 
     def models_inforcement_train(self):
         if self.classified_data != None:
@@ -106,77 +79,10 @@ class bombrtrain:
         '''
         
     def models_policy_train(self):
-<<<<<<< HEAD
-        if self.state_data != None and self.action_data != None :
-            print "start training policy supervised"
-            if self.weights != None:
-                self.model.load_weights(self.weights)
-            else:
-                self.weights = 'modelNweight/weight_withflag_all_policy.h5'
-            self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-            self.model.summary()
-            self.states = np.load(self.state_data)
-            self.actions = np.load(self.action_data)
-            indices = np.arange(len(self.states))
-            np.random.shuffle(indices)
-            self.states = self.states[indices]
-            self.actions = self.actions[indices]
-            callbacks = [
-                EarlyStopping(monitor='val_loss', patience=8, verbose=0),
-                ModelCheckpoint(filepath=self.weights, monitor='val_loss', save_best_only=True, verbose=0)
-            ]
-            self.model.fit(self.states, self.actions, batch_size=128, nb_epoch=20, verbose=1, validation_split=0.1, callbacks=callbacks)
-
-    def inverse_categorical_crossentropy(self, y_true, y_pred):
-        return K.categorical_crossentropy(y_pred, y_true)**(-1)
-
-    def models_inforcement_train(self):
-        if self.classified_data != None:
-            print "start training policy inforcement"
-            if self.weights != None:
-                self.model.load_weights(self.weights)
-            else:
-                self.weights = 'npyNmodel/weight_classified_dpn_Notmerge.h5'
-            #fitting for '+1'
-            self.classified = np.load(self.classified_data)
-            self.states_0 = np.asarray(self.classified[0][0])
-            self.actions_0 = np.asarray(self.classified[0][1])
-            self.states_1 = np.asarray(self.classified[1][0])
-            self.actions_1 = np.asarray(self.classified[1][1])
-            #self.states_1 = np.concatenate((states_0 , states_3),axis=0)
-            #print len(self.states_1)
-            #self.actions_1 = np.concatenate ((actions_0 , actions_3),axis = 0)
-            #print len(self.actions_1)
-            callbacks = [
-                EarlyStopping(monitor='val_loss', patience=8, verbose=0),
-                ModelCheckpoint(filepath=self.weights, monitor='val_loss', save_best_only=True, verbose=0)
-            ]
-            indices = np.arange(len(self.states_0))
-            np.random.shuffle(indices)
-            self.states_0 = self.states_0[indices]
-            self.actions_0 = self.actions_0[indices]
-            ind = np.arange(len(self.states_1))
-            np.random.shuffle(ind)
-            self.states_1 = self.states_1[ind]
-            self.actions_1 = self.actions_1[ind]
-
-            self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-            self.model.summary()
-            self.model.fit(self.states_0, self.actions_0, batch_size=128, nb_epoch=20, verbose=1, validation_split=0.1, callbacks=callbacks)
-            '''          
-            self.model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
-            self.model.summary()
-            self.model.fit(self.states_1, self.actions_1, batch_size=64, nb_epoch=20, verbose=1, validation_split=0.1, callbacks=callbacks)
-            '''
-=======
         if self.weights != None:
             self.model.load_weights(self.weights)
         else:
-<<<<<<< HEAD
             self.weights = './weight_default.h5'
-=======
-            self.weights = '../model/new_model_weight.h5'
->>>>>>> d92eb4deeb01cea0b68c9a235f81a36e4c0b66d4
         self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         self.model.summary()
         self.states = np.load(self.state_data)
@@ -190,7 +96,6 @@ class bombrtrain:
             ModelCheckpoint(filepath=self.weights, monitor='val_loss', save_best_only=True, verbose=0)
         ]
         self.model.fit(self.states, self.actions, batch_size=128, nb_epoch=50, verbose=1, validation_split=0.1, callbacks=callbacks)
->>>>>>> master
 
     def test_predict(self):
         self.model.load_weights(self.weights)
@@ -201,31 +106,6 @@ class bombrtrain:
             action = self.model.predict_classes(state)
             print (action)
 
-<<<<<<< HEAD
-    def dqnmodel_init(self, load_weights=False, weights_file="../dqnmodel_weight.h5"):
-        self.seq = np.load(self.option.seq)
-        self.dqn_datainit()
-        state_model = Sequential()
-        state_model.add(Reshape((1, BOMBR_ROW, BOMBR_COLUMN), input_shape=(BOMBR_ROW, BOMBR_COLUMN)))
-        state_model.add(Convolution2D(64, 3, 3, activation='relu'))
-        state_model.add(Convolution2D(64, 3, 3, activation='relu'))
-        state_model.add(Dropout(0.25))
-        state_model.add(Flatten())
-        state_model.add(Dense(128, activation='relu'))
-
-        action_model = Sequential()
-        action_model.add(Dense(32, input_shape=(10,), activation='relu'))
-        action_model.add(Dense(32, activation='relu'))
-
-        merged = Merge([state_model, action_model], mode='concat')
-        final_model = Sequential()
-        final_model.add(merged)
-        final_model.add(Dense(200, activation='relu'))
-        final_model.add(Dense(200, activation='relu'))
-        final_model.add(Dense(1, activation='linear'))
-        open('dqnmodel.json', 'w').write(final_model.to_json())
-        self.dqnmodel = DQN(final_model, load_weights, weights_file)
-=======
     def dqnmodel_init(self, load_weights=False, weights_file="./model/dqn_new_reward.h5"):
       self.seq = np.load(self.option.seq)
       state_model = Sequential()
@@ -248,7 +128,6 @@ class bombrtrain:
       final_model.add(Dense(1, activation='linear'))
       open('dqnmodel.json', 'w').write(final_model.to_json())
       self.dqnmodel = DQN(final_model, load_weights, weights_file)
->>>>>>> master
 
     def dqn_train(self):
       self.dqnmodel.train(self.seq, self.all_action, 0.96)
