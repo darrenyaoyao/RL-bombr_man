@@ -4,7 +4,11 @@ from keras.layers.convolutional import Convolution2D, ZeroPadding2D
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.models import model_from_json
 import numpy as np
+<<<<<<< HEAD
 #from DQN import DQN
+=======
+from DQN import DQN
+>>>>>>> d92eb4deeb01cea0b68c9a235f81a36e4c0b66d4
 BOMBR_COLUMN = 15
 BOMBR_ROW = 15
 ACTION_CLASSES = 10
@@ -38,7 +42,11 @@ class bombrtrain:
         self.model.add(Dropout(0.5))
         self.model.add(Dense(256, activation='relu'))
         self.model.add(Dense(ACTION_CLASSES, activation='softmax'))
+<<<<<<< HEAD
         open('./model_default.json', 'w').write(self.model.to_json())
+=======
+        open('../model/new_model.json', 'w').write(self.model.to_json())
+>>>>>>> d92eb4deeb01cea0b68c9a235f81a36e4c0b66d4
 
     def models_inforcement_train(self):
         if self.classified_data != None:
@@ -80,7 +88,11 @@ class bombrtrain:
         if self.weights != None:
             self.model.load_weights(self.weights)
         else:
+<<<<<<< HEAD
             self.weights = './weight_default.h5'
+=======
+            self.weights = '../model/new_model_weight.h5'
+>>>>>>> d92eb4deeb01cea0b68c9a235f81a36e4c0b66d4
         self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         self.model.summary()
         self.states = np.load(self.state_data)
