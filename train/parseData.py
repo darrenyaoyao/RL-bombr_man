@@ -21,30 +21,31 @@ class parseData:
         #classified[0]: +1 [1] : -1
         #classified['X'][0]:states
         #classified['X'][1]:actions
-        self.classified =  [[[],[]],[[],[]]]
-        action0 = np.zeros(10)
-        action0[0] = 1
-        flag = 0
-        for i in range(len(self.sequence)):
-            flag = self.sequence[i][-1]['Rt1']
-            for j in range(len(self.sequence[i])):
-                if j > 140:
-                    ACTION_PERCENT_RETAIN = 0.18
-                else:
-                    ACTION_PERCENT_RETAIN = 0.35
-                if ((self.sequence[i][-j-1]['At']==action0).all()) and (random.random() > ACTION_PERCENT_RETAIN):
-                    pass
-                else:
-                    if flag == int(-1):
-                        if j < 20:
-                            self.classified[1][0].append(self.sequence[i][-j-1]['St'])
-                            self.classified[1][1].append(self.inverse_action(self.sequence[i][-j-1]['At']))
+        if self.save_classify != None:
+            self.classified =  [[[],[]],[[],[]]]
+            action0 = np.zeros(10)
+            action0[0] = 1
+            flag = 0
+            for i in range(len(self.sequence)):
+                flag = self.sequence[i][-1]['Rt1']
+                for j in range(len(self.sequence[i])):
+                    if j > 140:
+                        ACTION_PERCENT_RETAIN = 0.18
+                    else:
+                        ACTION_PERCENT_RETAIN = 0.35
+                    if ((self.sequence[i][-j-1]['At']==action0).all()) and (random.random() > ACTION_PERCENT_RETAIN):
+                        pass
+                    else:
+                        if flag == int(-100):
+                            if j < 20:
+                                self.classified[1][0].append(self.sequence[i][-j-1]['St'])
+                                self.classified[1][1].append(self.inverse_action(self.sequence[i][-j-1]['At']))
+                            else:
+                                self.classified[0][0].append(self.sequence[i][-j-1]['St'])
+                                self.classified[0][1].append(self.sequence[i][-j-1]['At'])
                         else:
                             self.classified[0][0].append(self.sequence[i][-j-1]['St'])
                             self.classified[0][1].append(self.sequence[i][-j-1]['At'])
-                    else:
-                        self.classified[0][0].append(self.sequence[i][-j-1]['St'])
-                        self.classified[0][1].append(self.sequence[i][-j-1]['At'])
 
     def inverse_action(self, action):
         index = np.where(action == 1)[0]
@@ -57,21 +58,22 @@ class parseData:
         return new_action
     
     def policy_train_data(self):
-        self.states = []
-        self.actions = []
-        action0 = np.zeros(10)
-        action0[0] = 1
-        for i in range(len(self.sequence)):
-            for j in range(len(self.sequence[i])):
-                if j < 70:
-                    ACTION_PERCENT_RETAIN = 0.18
-                else:
-                    ACTION_PERCENT_RETAIN = 0.35
-                if ((self.sequence[i][j]['At']==action0).all()) and (random.random() > ACTION_PERCENT_RETAIN):
-                    pass
-                else:
-                    self.states.append(self.sequence[i][j]['St'])
-                    self.actions.append(self.sequence[i][j]['At'])
+        if self.save_state != None and self.save_action != None:
+            self.states = []
+            self.actions = []
+            action0 = np.zeros(10)
+            action0[0] = 1
+            for i in range(len(self.sequence)):
+                for j in range(len(self.sequence[i])):
+                    if j < 70:
+                        ACTION_PERCENT_RETAIN = 0.18
+                    else:
+                        ACTION_PERCENT_RETAIN = 0.35
+                    if ((self.sequence[i][j]['At']==action0).all()) and (random.random() > ACTION_PERCENT_RETAIN):
+                        pass
+                    else:
+                        self.states.append(self.sequence[i][j]['St'])
+                        self.actions.append(self.sequence[i][j]['At'])
 
     def getDataDistribution(self):
         try:
@@ -130,11 +132,11 @@ class parseData:
                     data.append(info)
                 else:
                     if counter > 1:
-                     data[counter-1]['At'] = action
-                     data[counter-2]['At1'] = action
-                     data[counter-1]['At1'] = FINALACTION
-                     data[counter-1]['St1'] = FINALSTATE
-                     data[counter-1]['Rt1'] = float(r.replace("\n",""))
+                        data[counter-1]['At'] = action
+                        data[counter-2]['At1'] = action
+                        data[counter-1]['At1'] = FINALACTION
+                        data[counter-1]['St1'] = FINALSTATE
+                        data[counter-1]['Rt1'] = float(r.replace("\n",""))
                 if len(data) > 2:
                     if(self.check_duplicate(data)):
                         counter = counter-1

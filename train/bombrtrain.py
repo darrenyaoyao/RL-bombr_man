@@ -1,12 +1,12 @@
 from keras.models import Sequential
 from keras.layers.core import Dense, Dropout, Flatten, Reshape, Merge
-from keras.layers.convolutional import Convolution2D
+from keras.layers.convolutional import Convolution2D, ZeroPadding2D
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.models import model_from_json
 import numpy as np
-from DQN import DQN
-BOMBR_COLUMN = 19
-BOMBR_ROW = 19
+#from DQN import DQN
+BOMBR_COLUMN = 15
+BOMBR_ROW = 15
 ACTION_CLASSES = 10
 FEATURE_CLASSES = 6
 
@@ -17,6 +17,7 @@ class bombrtrain:
         self.reward_file = option.reward
         self.model = option.model
         self.weights = option.weights
+        self.classified_data = option.classify
         self.state_data = option.state
         self.action_data = option.action
         if self.model == None:
@@ -27,21 +28,59 @@ class bombrtrain:
     def models_init(self):
         self.model = Sequential()
         self.model.add(Reshape((1, BOMBR_ROW, BOMBR_COLUMN), input_shape=(BOMBR_ROW, BOMBR_COLUMN)))
-        self.model.add(Convolution2D(64, 3, 3, activation='relu'))
-        self.model.add(Convolution2D(64, 3, 3, activation='relu'))
+        self.model.add(ZeroPadding2D(padding=(1, 1)))
+        self.model.add(Convolution2D(128, 3, 3, activation='relu'))
+        self.model.add(ZeroPadding2D(padding=(1, 1)))
         self.model.add(Convolution2D(128, 3, 3, activation='relu'))
         self.model.add(Dropout(0.25))
         self.model.add(Flatten())
         self.model.add(Dense(256, activation='relu'))
         self.model.add(Dropout(0.5))
+        self.model.add(Dense(256, activation='relu'))
         self.model.add(Dense(ACTION_CLASSES, activation='softmax'))
-        open('model_1.json', 'w').write(self.model.to_json())
+        open('./model_default.json', 'w').write(self.model.to_json())
 
+    def models_inforcement_train(self):
+        if self.classified_data != None:
+            print "start training policy inforcement"
+        if self.weights != None:
+            self.model.load_weights(self.weights)
+        else:
+            self.weights = './weight_inforcement_default.h5'                                
+        #fitting for '+1'
+        self.classified = np.load(self.classified_data)
+        self.states_0 = np.asarray(self.classified[0][0])
+        self.actions_0 = np.asarray(self.classified[0][1])
+        self.states_1 = np.asarray(self.classified[1][0])
+        self.actions_1 = np.asarray(self.classified[1][1])
+        #self.states_2 = np.concatenate((states_0 , states_1),axis=0)
+        #self.actions_2 = np.concatenate ((actions_0 , actions_1),axis=0)
+        callbacks = [
+            EarlyStopping(monitor='val_loss', patience=8, verbose=0),
+            ModelCheckpoint(filepath=self.weights, monitor='val_loss', save_best_only=True, verbose=0)
+        ]
+        indices = np.arange(len(self.states_0))
+        np.random.shuffle(indices)
+        self.states_0 = self.states_0[indices]
+        self.actions_0 = self.actions_0[indices]
+        ind = np.arange(len(self.states_1))
+        np.random.shuffle(ind)
+        self.states_1 = self.states_1[ind]
+        self.actions_1 = self.actions_1[ind]
+        self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+        self.model.summary()
+        self.model.fit(self.states_0, self.actions_0, batch_size=128, nb_epoch=30, verbose=1, validation    _split=0.1, callbacks=callbacks)
+        '''
+        self.model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
+        self.model.summary()
+        self.model.fit(self.states_1, self.actions_1, batch_size=32, nb_epoch=20, verbose=1, validation_    split=0.1, callbacks=callbacks)
+        '''
+        
     def models_policy_train(self):
         if self.weights != None:
             self.model.load_weights(self.weights)
         else:
-            self.weights = 'model_weight_1.h5'
+            self.weights = './weight_default.h5'
         self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         self.model.summary()
         self.states = np.load(self.state_data)
@@ -105,6 +144,7 @@ class bombrtrain:
             a[0] = game[i]['At']
             Q = self.dqnmodel.predict([x, a])
             print Q[0][0]
+    
     def model_feature_init(self):
         states_model = Sequential()
         states_model.add(Reshape((1, BOMBR_ROW, BOMBR_COLUMN), input_shape=(BOMBR_ROW, BOMBR_COLUMN)))
