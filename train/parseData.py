@@ -55,7 +55,7 @@ class parseData:
         if len(index) != 0 :
             new_action[index[0]] = 0
         return new_action
-    
+
     def policy_train_data(self):
         self.states = []
         self.actions = []
@@ -130,11 +130,11 @@ class parseData:
                     data.append(info)
                 else:
                     if counter > 1:
-                    data[counter-1]['At'] = action
-                    data[counter-2]['At1'] = action
-                    data[counter-1]['At1'] = FINALACTION
-                    data[counter-1]['St1'] = FINALSTATE
-                    data[counter-1]['Rt1'] = int(r.replace("\n",""))
+                        data[counter-1]['At'] = action
+                        data[counter-2]['At1'] = action
+                        data[counter-1]['At1'] = FINALACTION
+                        data[counter-1]['St1'] = FINALSTATE
+                        data[counter-1]['Rt1'] = float(r.replace("\n",""))
                 if len(data) > 2:
                     if(self.check_duplicate(data)):
                         counter = counter-1
@@ -148,12 +148,12 @@ class parseData:
         states[0][1] = flag[1]
         states[0][2] = flag[2]
         return states
-    
+
     def spliter(self, string, splitElm):
         data = string.split(splitElm)
         data.pop()
         return data
-    
+
     def save_classify_data(self):
         classify = np.asarray(self.classified)
         if self.save_classify != None:

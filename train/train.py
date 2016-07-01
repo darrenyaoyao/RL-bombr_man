@@ -14,4 +14,4 @@ parser.add_argument('-C', action="store", dest='classified')
 
 Bombr_train = bombrtrain(parser.parse_args())
 Bombr_train.models_policy_train()
-Bombr_train.models_inforcement_train()
+#Bombr_train.models_inforcement_train()

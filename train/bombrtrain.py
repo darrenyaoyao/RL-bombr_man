@@ -6,8 +6,8 @@ from keras.models import model_from_json
 from keras.layers.core import Dense, Dropout, Flatten, Reshape, Merge
 import numpy as np
 from DQN import DQN
-BOMBR_COLUMN = 19
-BOMBR_ROW = 19
+BOMBR_COLUMN = 15
+BOMBR_ROW = 15
 ACTION_CLASSES = 10
 
 class bombrtrain:
@@ -28,16 +28,14 @@ class bombrtrain:
     def models_init(self):
         self.model = Sequential()
         self.model.add(Reshape((1, BOMBR_ROW, BOMBR_COLUMN), input_shape=(BOMBR_ROW, BOMBR_COLUMN)))
-        self.model.add(Convolution2D(64, 5, 5, activation='relu'))
-        self.model.add(Convolution2D(64, 5, 5, activation='relu'))
         self.model.add(Convolution2D(128, 5, 5, activation='relu'))
-        self.model.add(Convolution2D(128, 5, 5, activation='relu'))
+        self.model.add(Convolution2D(64, 3, 3, activation='relu'))
         self.model.add(Dropout(0.25))
         self.model.add(Flatten())
         self.model.add(Dense(256, activation='relu'))
         self.model.add(Dropout(0.5))
         self.model.add(Dense(ACTION_CLASSES, activation='softmax'))
-        open('npyNmodel/model_dpn_Notmerge.json', 'w').write(self.model.to_json())
+        open('modelNweight/model_withflag_all.json', 'w').write(self.model.to_json())
 
     def models_policy_train(self):
         if self.state_data != None and self.action_data != None :
@@ -45,7 +43,7 @@ class bombrtrain:
             if self.weights != None:
                 self.model.load_weights(self.weights)
             else:
-                self.weights = 'npyNmodel/model_weight_policy.h5'
+                self.weights = 'modelNweight/weight_withflag_all_policy.h5'
             self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
             self.model.summary()
             self.states = np.load(self.state_data)
@@ -92,7 +90,7 @@ class bombrtrain:
             np.random.shuffle(ind)
             self.states_1 = self.states_1[ind]
             self.actions_1 = self.actions_1[ind]
-            
+
             self.model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
             self.model.summary()
             self.model.fit(self.states_0, self.actions_0, batch_size=128, nb_epoch=20, verbose=1, validation_split=0.1, callbacks=callbacks)
@@ -125,7 +123,7 @@ class bombrtrain:
         action_model = Sequential()
         action_model.add(Dense(32, input_shape=(10,), activation='relu'))
         action_model.add(Dense(32, activation='relu'))
-        
+
         merged = Merge([state_model, action_model], mode='concat')
         final_model = Sequential()
         final_model.add(merged)
